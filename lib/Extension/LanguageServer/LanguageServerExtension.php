@@ -13,6 +13,7 @@ use Phpactor\Extension\LanguageServer\Handler\DebugHandler;
 use Phpactor\Extension\LanguageServer\Listener\InvalidConfigListener;
 use Phpactor\Extension\LanguageServer\Listener\SelfDestructListener;
 use Phpactor\Extension\LanguageServer\Logger\ClientLogger;
+use Phpactor\Extension\LanguageServer\Middleware\BlackfireProbeMiddleware;
 use Phpactor\Extension\LanguageServer\Middleware\ProfilerMiddleware;
 use Phpactor\Extension\LanguageServer\Middleware\TraceMiddleware;
 use Phpactor\Extension\Logger\LoggingExtension;
@@ -92,7 +93,7 @@ class LanguageServerExtension implements Extension
     public const LOG_CHANNEL = 'LSP';
     public const PARAM_SHUTDOWN_GRACE_PERIOD = 'language_server.shutdown_grace_period';
     public const PARAM_SELF_DESTRUCT_TIMEOUT = 'language_server.self_destruct_timeout';
-    
+
     public function configure(Resolver $schema): void
     {
         $schema->setDefaults([
@@ -130,7 +131,7 @@ class LanguageServerExtension implements Extension
         ]);
     }
 
-    
+
     public function load(ContainerBuilder $container): void
     {
         $this->registerServer($container);
@@ -313,6 +314,7 @@ class LanguageServerExtension implements Extension
     {
         $container->register(MiddlewareDispatcher::class, function (Container $container) {
             $stack = [];
+            $stack[] = new BlackfireProbeMiddleware();
 
             if ($container->getParameter(self::PARAM_PROFILE)) {
                 $stack[] = new ProfilerMiddleware($this->logger($container));
@@ -364,13 +366,13 @@ class LanguageServerExtension implements Extension
 
         $container->register(Handlers::class, function (Container $container) {
             $handlers = [];
-        
+
             foreach (array_keys(
                 $container->getServiceIdsForTag(LanguageServerExtension::TAG_METHOD_HANDLER)
             ) as $serviceId) {
                 $handlers[] = $container->get($serviceId);
             }
-        
+
             return new Handlers(...$handlers);
         });
 
