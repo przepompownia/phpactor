@@ -5,6 +5,9 @@ Changelog
 
 Bug fixes:
 
+  - [wr] Do not complete constants on class instance #1614
+  - [wr] Include virtual properties in class members #1623
+  - [wr] Fix false positive for virutal method not existing #1603
   - [wr] Ignore exceptions (permission denied f.e.) when traversing files #1569
   - [wr] Fix resolutin of virtual method
   - [ct] Fix missing properties refactor does not import class #1534
