@@ -6,11 +6,23 @@ use PHPUnit\Framework\TestCase;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\WorseReflection\Core\ClassName;
 use Phpactor\WorseReflection\Core\TypeFactory;
+use Phpactor\WorseReflection\Core\Type\FalseType;
+use Phpactor\WorseReflection\Core\Type\NeverType;
 use Phpactor\WorseReflection\ReflectorBuilder;
 use stdClass;
 
 class TypeFactoryTest extends TestCase
 {
+    public function testNever(): void
+    {
+        self::assertEquals(new NeverType(), TypeFactory::fromString('never'));
+    }
+
+    public function testFalse(): void
+    {
+        self::assertEquals(new FalseType, TypeFactory::fromString('false'));
+    }
+
     /**
      * @testdox It should __toString the given type.
      * @dataProvider provideToString
@@ -130,6 +142,18 @@ class TypeFactoryTest extends TestCase
             TypeFactory::fromString('class-string'),
             'class-string',
             'string',
+        ];
+
+        yield 'list' => [
+            TypeFactory::fromString('class-string'),
+            'class-string',
+            'string',
+        ];
+
+        yield 'false' => [
+            TypeFactory::fromString('false'),
+            'false',
+            'false',
         ];
     }
 

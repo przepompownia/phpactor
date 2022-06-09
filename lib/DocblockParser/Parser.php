@@ -28,6 +28,7 @@ use Phpactor\DocblockParser\Ast\TypeNode;
 use Phpactor\DocblockParser\Ast\Type\ConstantNode;
 use Phpactor\DocblockParser\Ast\Type\GenericNode;
 use Phpactor\DocblockParser\Ast\Type\IntersectionNode;
+use Phpactor\DocblockParser\Ast\Type\ListBracketsNode;
 use Phpactor\DocblockParser\Ast\Type\ListNode;
 use Phpactor\DocblockParser\Ast\Type\LiteralFloatNode;
 use Phpactor\DocblockParser\Ast\Type\LiteralIntegerNode;
@@ -38,6 +39,7 @@ use Phpactor\DocblockParser\Ast\Type\ParenthesizedType;
 use Phpactor\DocblockParser\Ast\Type\ScalarNode;
 use Phpactor\DocblockParser\Ast\Type\ThisNode;
 use Phpactor\DocblockParser\Ast\Type\UnionNode;
+use Phpactor\DocblockParser\Ast\Type\UnsupportedNode;
 use Phpactor\DocblockParser\Ast\UnknownTag;
 use Phpactor\DocblockParser\Ast\ValueNode;
 use Phpactor\DocblockParser\Ast\Value\NullValue;
@@ -98,6 +100,7 @@ final class Parser
                 return $this->parseMethod();
 
             case '@property':
+            case '@property-read':
                 return $this->parseProperty();
 
             case '@mixin':
@@ -296,7 +299,7 @@ final class Parser
 
         if ($this->tokens->current->type === Token::T_LIST) {
             $list = $this->tokens->chomp();
-            return new ListNode($this->createTypeFromToken($type), $list);
+            return new ListBracketsNode($this->createTypeFromToken($type), $list);
         }
 
         if ($this->tokens->current->type === Token::T_BRACKET_ANGLE_OPEN) {
@@ -351,6 +354,9 @@ final class Parser
         if (strtolower($type->value) === 'array') {
             return new ArrayNode();
         }
+        if (strtolower($type->value) === 'list') {
+            return new ListNode();
+        }
         if (in_array($type->value, self::SCALAR_TYPES)) {
             return new ScalarNode($type);
         }
@@ -362,6 +368,9 @@ final class Parser
         }
         if ($type->type === Token::T_INTEGER) {
             return new LiteralIntegerNode($type);
+        }
+        if ($type->type !== Token::T_LABEL) {
+            return new UnsupportedNode($type);
         }
 
         $classNode = new ClassNode($type);

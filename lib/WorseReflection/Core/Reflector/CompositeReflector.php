@@ -3,6 +3,7 @@
 namespace Phpactor\WorseReflection\Core\Reflector;
 
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\ReflectionNavigation;
+use Phpactor\WorseReflection\Core\Diagnostics;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionEnum;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionFunction;
 use Phpactor\WorseReflection\Core\SourceCode;
@@ -13,7 +14,7 @@ use Phpactor\WorseReflection\Core\Reflection\ReflectionTrait;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionOffset;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethodCall;
-use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassLikeCollection;
 use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionFunctionCollection;
 
 class CompositeReflector implements Reflector
@@ -59,7 +60,7 @@ class CompositeReflector implements Reflector
         return $this->classReflector->reflectClassLike($className);
     }
     
-    public function reflectClassesIn($sourceCode): ReflectionClassCollection
+    public function reflectClassesIn($sourceCode): ReflectionClassLikeCollection
     {
         return $this->sourceCodeReflector->reflectClassesIn($sourceCode);
     }
@@ -97,5 +98,10 @@ class CompositeReflector implements Reflector
     public function sourceCodeForFunction($name): SourceCode
     {
         return $this->functionReflector->sourceCodeForFunction($name);
+    }
+
+    public function diagnostics($sourceCode): Diagnostics
+    {
+        return $this->sourceCodeReflector->diagnostics($sourceCode);
     }
 }

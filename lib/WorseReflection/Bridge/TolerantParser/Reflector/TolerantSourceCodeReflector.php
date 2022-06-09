@@ -5,13 +5,14 @@ namespace Phpactor\WorseReflection\Bridge\TolerantParser\Reflector;
 use Microsoft\PhpParser\Node\SourceFileNode;
 use Phpactor\TextDocument\TextDocument;
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\ReflectionNavigation;
+use Phpactor\WorseReflection\Core\Diagnostics;
 use Phpactor\WorseReflection\Core\Exception\CouldNotResolveNode;
 use Phpactor\WorseReflection\Core\Exception\MethodCallNotFound;
 use Phpactor\WorseReflection\Core\Reflector\SourceCodeReflector;
-use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassLikeCollection;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionOffset;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethodCall;
-use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\Collection\ReflectionClassCollection as TolerantReflectionClassCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassLikeCollection as TolerantReflectionClassCollection;
 use Phpactor\WorseReflection\Core\SourceCode;
 use Phpactor\WorseReflection\Core\Offset;
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\ReflectionOffset as TolerantReflectionOffset;
@@ -19,12 +20,12 @@ use Phpactor\WorseReflection\Core\Inference\NodeReflector;
 use Phpactor\WorseReflection\Core\ServiceLocator;
 use Microsoft\PhpParser\Parser;
 use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionFunctionCollection as CoreReflectionFunctionCollection;
-use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\Collection\ReflectionFunctionCollection as TolerantReflectionFunctionCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionFunctionCollection as TolerantReflectionFunctionCollection;
 
 class TolerantSourceCodeReflector implements SourceCodeReflector
 {
     private ServiceLocator $serviceLocator;
-    
+
     private Parser $parser;
 
     public function __construct(ServiceLocator $serviceLocator, Parser $parser)
@@ -33,7 +34,7 @@ class TolerantSourceCodeReflector implements SourceCodeReflector
         $this->parser = $parser;
     }
     
-    public function reflectClassesIn($sourceCode): ReflectionClassCollection
+    public function reflectClassesIn($sourceCode): ReflectionClassLikeCollection
     {
         $sourceCode = SourceCode::fromUnknown($sourceCode);
         $node = $this->parseSourceCode($sourceCode);
@@ -52,6 +53,20 @@ class TolerantSourceCodeReflector implements SourceCodeReflector
         $frame = $this->serviceLocator->frameBuilder()->build($node);
 
         return TolerantReflectionOffset::fromFrameAndSymbolContext($frame, $resolver->resolveNode($frame, $node));
+    }
+
+    public function diagnostics($sourceCode): Diagnostics
+    {
+        $sourceCode = SourceCode::fromUnknown($sourceCode);
+        return $this->serviceLocator->cache()->getOrSet(
+            'diagnoistics__' . $sourceCode->__toString(),
+            function () use ($sourceCode): Diagnostics {
+                $rootNode = $this->parseSourceCode($sourceCode);
+                $walker = $this->serviceLocator->newDiagnosticsWalker();
+                $this->serviceLocator->frameBuilder()->withWalker($walker)->build($rootNode);
+                return $walker->diagnostics();
+            }
+        );
     }
 
     /**

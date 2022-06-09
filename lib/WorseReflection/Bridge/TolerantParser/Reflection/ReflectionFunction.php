@@ -2,7 +2,7 @@
 
 namespace Phpactor\WorseReflection\Bridge\TolerantParser\Reflection;
 
-use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\Collection\ReflectionParameterCollection as TolerantReflectionParameterCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionParameterCollection as TolerantReflectionParameterCollection;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionFunction as CoreReflectionFunction;
 use Phpactor\WorseReflection\Core\Name;
 use Phpactor\WorseReflection\Core\Inference\Frame;
@@ -46,7 +46,7 @@ class ReflectionFunction extends AbstractReflectedNode implements CoreReflection
 
     public function docblock(): DocBlock
     {
-        return $this->serviceLocator->docblockFactory()->create(new DefaultTypeResolver($this->scope()), $this->node()->getLeadingCommentAndWhitespaceText());
+        return $this->serviceLocator->docblockFactory()->create($this->node()->getLeadingCommentAndWhitespaceText())->withTypeResolver(new DefaultTypeResolver($this->scope()));
     }
 
     public function inferredType(): Type

@@ -2,7 +2,7 @@
 
 namespace Phpactor\WorseReflection\Tests\Integration\Core\Inference;
 
-use Phpactor\WorseReflection\Core\Cache\NullCache;
+use Phpactor\WorseReflection\Core\Cache\StaticCache;
 use Phpactor\WorseReflection\Core\DefaultResolverFactory;
 use Phpactor\WorseReflection\Core\Inference\NodeToTypeConverter;
 use Phpactor\WorseReflection\Core\Inference\PropertyAssignments;
@@ -277,7 +277,7 @@ class NodeContextResolverTest extends IntegrationTestCase
                 }
 
                 EOT
-            , [], ['type' => '<missing>', 'symbol_type' => '<unknown>', 'symbol_name' => '<unknown>']
+            , [], ['type' => '<missing>', 'symbol_type' => '<unknown>', 'symbol_name' => 'Parameter']
             ];
 
         yield 'It returns the FQN of a static call' => [
@@ -1159,7 +1159,7 @@ class NodeContextResolverTest extends IntegrationTestCase
         $resolver = new NodeContextResolver(
             $reflector,
             $this->logger(),
-            new NullCache(),
+            new StaticCache(),
             (new DefaultResolverFactory($reflector, $nameResolver))->createResolvers(),
         );
 

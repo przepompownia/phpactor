@@ -825,6 +825,68 @@ class WorseClassMemberCompletorTest extends TolerantCompletorTestCase
                 ],
             ],
         ];
+
+        yield 'parent::' => [
+            <<<'EOT'
+                <?php
+
+                abstract class Bar {
+                    public function baz(): string {}
+                }
+
+                class Foobar extends Bar
+                {
+                    const FOOBAR = 'foobar';
+                    const BARFOO = 'barfoo';
+
+                    public function bar(): string {
+                        parent::<>
+                    }
+                }
+                EOT
+            , [
+                [
+                    'type' => Suggestion::TYPE_METHOD,
+                    'name' => 'baz',
+                    'short_description' => 'pub baz(): string',
+                    'snippet' => 'baz()'
+                ],
+            ],
+        ];
+
+        yield 'parenthesized type' => [
+            <<<'EOT'
+                <?php
+
+                interface Zero {}
+                interface OneIn extends Zero {}
+                interface TwoIn extends Zero {}
+                class One implements OneIn { public function foo(); }
+                class Two implements TwoIn { public function foo(); }
+
+                function (Zero $zero) {
+                    if (!$zero instanceof One && !$zero instanceof Two) {
+                        return;
+                    }
+
+                    $zero-><>
+                }
+                EOT
+            , [
+                [
+                    'type' => Suggestion::TYPE_METHOD,
+                    'name' => 'foo',
+                    'short_description' => 'pub foo()',
+                    'snippet' => 'foo()'
+                ],
+                [
+                    'type' => Suggestion::TYPE_METHOD,
+                    'name' => 'foo',
+                    'short_description' => 'pub foo()',
+                    'snippet' => 'foo()'
+                ],
+            ],
+        ];
     }
 
     /**

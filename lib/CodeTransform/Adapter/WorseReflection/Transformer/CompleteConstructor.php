@@ -68,7 +68,7 @@ class CompleteConstructor implements Transformer
                 $parameterType = $parameter->inferredType();
                 if ($parameterType->isDefined()) {
                     $parameterType = $parameterType->toLocalType($class->scope());
-                    $propertyBuilder->type($parameterType->toPhpString());
+                    $propertyBuilder->type($parameterType->toPhpString(), $parameterType);
                     $propertyBuilder->docType((string)$parameterType);
                 }
             }
@@ -117,7 +117,7 @@ class CompleteConstructor implements Transformer
      */
     private function candidateClasses(SourceCode $source): Generator
     {
-        $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source));
+        $classes = $this->reflector->reflectClassesIn(WorseSourceCode::fromString((string) $source))->classes();
         foreach ($classes as $class) {
             if ($class instanceof ReflectionInterface) {
                 continue;

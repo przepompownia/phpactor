@@ -6,6 +6,12 @@ use Phpactor\Extension\Logger\LoggingExtension;
 use Phpactor\Extension\ClassToFile\ClassToFileExtension;
 use Phpactor\Extension\FilePathResolver\FilePathResolverExtension;
 use Phpactor\WorseReflection\Bridge\Phpactor\MemberProvider\DocblockMemberProvider;
+use Phpactor\WorseReflection\Bridge\Phpactor\MemberProvider\MixinMemberProvider;
+use Phpactor\WorseReflection\Bridge\TolerantParser\Diagnostics\AssignmentToMissingPropertyProvider;
+use Phpactor\WorseReflection\Bridge\TolerantParser\Diagnostics\MissingDocblockProvider;
+use Phpactor\WorseReflection\Bridge\TolerantParser\Diagnostics\MissingMethodProvider;
+use Phpactor\WorseReflection\Bridge\TolerantParser\Diagnostics\MissingReturnTypeProvider;
+use Phpactor\WorseReflection\Bridge\TolerantParser\Diagnostics\UnresolvableNameProvider;
 use Phpactor\WorseReflection\Core\Cache;
 use Phpactor\WorseReflection\Core\Cache\TtlCache;
 use Phpactor\WorseReflection\Core\SourceCodeLocator\NativeReflectionFunctionSourceLocator;
@@ -31,11 +37,13 @@ class WorseReflectionExtension implements Extension
     const PARAM_CACHE_LIFETIME = 'worse_reflection.cache_lifetime';
     const PARAM_ENABLE_CONTEXT_LOCATION = 'worse_reflection.enable_context_location';
     const SERVICE_PARSER = 'worse_reflection.tolerant_parser';
-
+    const TAG_DIAGNOSTIC_PROVIDER = 'worse_reflection.diagnostics_provider';
+    const PARAM_IMPORT_GLOBALS = 'language_server_code_transform.import_globals';
     
     public function configure(Resolver $schema): void
     {
         $schema->setDefaults([
+            self::PARAM_IMPORT_GLOBALS => false,
             self::PARAM_ENABLE_CACHE => true,
             self::PARAM_CACHE_LIFETIME => 5.0,
             self::PARAM_ENABLE_CONTEXT_LOCATION => true,
@@ -53,6 +61,7 @@ class WorseReflectionExtension implements Extension
         ,
             self::PARAM_STUB_DIR => 'Location of the core PHP stubs - these will be scanned and cached on the first request',
             self::PARAM_STUB_CACHE_DIR => 'Cache directory for stubs',
+            self::PARAM_IMPORT_GLOBALS => 'Show hints for non-imported global classes and functions',
         ]);
     }
 
@@ -61,6 +70,7 @@ class WorseReflectionExtension implements Extension
         $this->registerReflection($container);
         $this->registerSourceLocators($container);
         $this->registerMemberProviders($container);
+        $this->registerDiagnosticProviders($container);
     }
 
     private function registerReflection(ContainerBuilder $container): void
@@ -89,6 +99,9 @@ class WorseReflectionExtension implements Extension
 
             foreach (array_keys($container->getServiceIdsForTag(self::TAG_MEMBER_PROVIDER)) as $serviceId) {
                 $builder->addMemberProvider($container->get($serviceId));
+            }
+            foreach (array_keys($container->getServiceIdsForTag(self::TAG_DIAGNOSTIC_PROVIDER)) as $serviceId) {
+                $builder->addDiagnosticProvider($container->get($serviceId));
             }
         
             $builder->withLogger(
@@ -132,5 +145,27 @@ class WorseReflectionExtension implements Extension
         $container->register('worse_reflection.member_provider.docblock', function (Container $container) {
             return new DocblockMemberProvider();
         }, [ self::TAG_MEMBER_PROVIDER => []]);
+        $container->register('worse_reflection.member_provider.mixins', function (Container $container) {
+            return new MixinMemberProvider();
+        }, [ self::TAG_MEMBER_PROVIDER => []]);
+    }
+
+    private function registerDiagnosticProviders(ContainerBuilder $container): void
+    {
+        $container->register(MissingMethodProvider::class, function (Container $container) {
+            return new MissingMethodProvider();
+        }, [ self::TAG_DIAGNOSTIC_PROVIDER => []]);
+        $container->register(MissingDocblockProvider::class, function (Container $container) {
+            return new MissingDocblockProvider();
+        }, [ self::TAG_DIAGNOSTIC_PROVIDER => []]);
+        $container->register(AssignmentToMissingPropertyProvider::class, function (Container $container) {
+            return new AssignmentToMissingPropertyProvider();
+        }, [ self::TAG_DIAGNOSTIC_PROVIDER => []]);
+        $container->register(MissingReturnTypeProvider::class, function (Container $container) {
+            return new MissingReturnTypeProvider();
+        }, [ self::TAG_DIAGNOSTIC_PROVIDER => []]);
+        $container->register(UnresolvableNameProvider::class, function (Container $container) {
+            return new UnresolvableNameProvider($container->getParameter(self::PARAM_IMPORT_GLOBALS));
+        }, [ self::TAG_DIAGNOSTIC_PROVIDER => []]);
     }
 }

@@ -33,7 +33,7 @@ class TestAssertWalker implements Walker
         return [CallExpression::class];
     }
 
-    public function walk(FrameResolver $resolver, Frame $frame, Node $node): Frame
+    public function enter(FrameResolver $resolver, Frame $frame, Node $node): Frame
     {
         assert($node instanceof CallExpression);
         $name = $node->callableExpression->getText();
@@ -62,6 +62,11 @@ class TestAssertWalker implements Walker
             return $frame;
         }
 
+        return $frame;
+    }
+
+    public function exit(FrameResolver $resolver, Frame $frame, Node $node): Frame
+    {
         return $frame;
     }
 

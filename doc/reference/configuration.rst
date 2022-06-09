@@ -774,6 +774,21 @@ WorseReflectionExtension
 ------------------------
 
 
+.. _param_language_server_code_transform.import_globals:
+
+
+``language_server_code_transform.import_globals``
+"""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+
+
+Show hints for non-imported global classes and functions
+
+
+**Default**: ``false``
+
+
 .. _param_worse_reflection.enable_cache:
 
 
@@ -1088,7 +1103,13 @@ ConsoleExtension
 
 
 
+Verbosity level
+
+
 **Default**: ``32``
+
+
+**Allowed values**: 16, 32, 64, 128, 256
 
 
 .. _param_console.decorated:
@@ -1100,7 +1121,13 @@ ConsoleExtension
 
 
 
+Whether to decorate messages (null for auto-guessing)
+
+
 **Default**: ``null``
+
+
+**Allowed values**: true, false, null
 
 
 .. _WorseReferenceFinderExtension:
@@ -1472,21 +1499,6 @@ LanguageServerCodeTransformExtension
 ------------------------------------
 
 
-.. _param_language_server_code_transform.import_globals:
-
-
-``language_server_code_transform.import_globals``
-"""""""""""""""""""""""""""""""""""""""""""""""""
-
-
-
-
-Show hints for non-imported global classes and functions
-
-
-**Default**: ``false``
-
-
 .. _param_language_server_code_transform.import_name.report_non_existing_names:
 
 
@@ -1499,7 +1511,7 @@ Show hints for non-imported global classes and functions
 Show an error if a diagnostic name cannot be resolved - can produce false positives
 
 
-**Default**: ``false``
+**Default**: ``true``
 
 
 .. _LanguageServerPhpstanExtension:

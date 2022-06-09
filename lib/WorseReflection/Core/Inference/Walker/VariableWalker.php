@@ -41,7 +41,7 @@ class VariableWalker implements Walker
         return [];
     }
 
-    public function walk(FrameResolver $resolver, Frame $frame, Node $node): Frame
+    public function enter(FrameResolver $resolver, Frame $frame, Node $node): Frame
     {
         $scope = new ReflectionScope($resolver->reflector(), $node);
         $docblockType = $this->injectVariablesFromComment($scope, $frame, $node);
@@ -83,15 +83,20 @@ class VariableWalker implements Walker
             $locals->replace($existing, $existing->withType($context->type()));
             return $frame;
         }
-        $frame->locals()->add(WorseVariable::fromSymbolContext($context));
+        $frame->locals()->set(WorseVariable::fromSymbolContext($context));
 
+        return $frame;
+    }
+
+    public function exit(FrameResolver $resolver, Frame $frame, Node $node): Frame
+    {
         return $frame;
     }
 
     private function injectVariablesFromComment(PhpactorReflectionScope $scope, Frame $frame, Node $node): Type
     {
         $comment = $node->getLeadingCommentAndWhitespaceText();
-        $docblock = $this->docblockFactory->create(new DefaultTypeResolver($scope), $comment);
+        $docblock = $this->docblockFactory->create($comment)->withTypeResolver(new DefaultTypeResolver($scope));
 
         if (false === $docblock->isDefined()) {
             return TypeFactory::undefined();

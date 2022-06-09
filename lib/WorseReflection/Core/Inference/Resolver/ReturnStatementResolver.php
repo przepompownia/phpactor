@@ -14,7 +14,7 @@ class ReturnStatementResolver implements Resolver
 {
     public function resolve(NodeContextResolver $resolver, Frame $frame, Node $node): NodeContext
     {
-        $context = NodeContextFactory::create('return', $node->getStartPosition(), $node->getEndPosition());
+        $context = NodeContextFactory::forNode($node);
         assert($node instanceof ReturnStatement);
 
         if (!$node->expression) {
@@ -24,12 +24,12 @@ class ReturnStatementResolver implements Resolver
         $type = $resolver->resolveNode($frame, $node->expression)->type();
         $context = $context->withType($type);
 
-        if ($frame->returnType()->isDefined()) {
-            $frame->withReturnType($frame->returnType()->addType($type));
+        if ($frame->returnType()->isVoid()) {
+            $frame->withReturnType($type);
             return $context;
         }
 
-        $frame->withReturnType($type);
+        $frame->withReturnType($frame->returnType()->addType($type));
 
         return $context;
     }

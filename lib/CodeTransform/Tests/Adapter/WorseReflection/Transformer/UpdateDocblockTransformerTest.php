@@ -561,6 +561,48 @@ class UpdateDocblockTransformerTest extends WorseTestCase
                 }
                 EOT
         ];
+
+        yield 'trait' => [
+            <<<'EOT'
+                <?php
+
+                namespace Foo;
+
+                trait Foobar {
+                    public function baz(): array
+                    {
+                        yield [
+                            'foobar',
+                            function (Bar $b): string {
+                            }
+                        ];
+                    }
+                }
+                EOT
+            ,
+            <<<'EOT'
+                <?php
+
+                namespace Foo;
+
+                use Generator;
+
+                trait Foobar {
+
+                    /**
+                     * @return Generator<array{string,Closure(Bar): string}>
+                     */
+                    public function baz(): array
+                    {
+                        yield [
+                            'foobar',
+                            function (Bar $b): string {
+                            }
+                        ];
+                    }
+                }
+                EOT
+        ];
     }
 
     /**
@@ -586,6 +628,21 @@ class UpdateDocblockTransformerTest extends WorseTestCase
                 <?php
 
                 class Foobar {
+                }
+                EOT
+            ,
+            [
+            ]
+        ];
+
+        yield 'ignore constructor' => [
+            <<<'EOT'
+                <?php
+
+                class Foobar {
+                    public function __construct()
+                    {
+                    }
                 }
                 EOT
             ,

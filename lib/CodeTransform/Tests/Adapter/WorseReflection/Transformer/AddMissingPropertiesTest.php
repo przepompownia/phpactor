@@ -23,7 +23,10 @@ class AddMissingPropertiesTest extends WorseTestCase
         $this->assertEquals((string) $expected, (string) $transformed->apply($source));
     }
 
-    public function provideCompleteConstructor()
+    /**
+     * @return Generator<string,array{string,string}>
+     */
+    public function provideCompleteConstructor(): Generator
     {
         yield 'It does nothing on source with no classes' => [
             <<<'EOT'
@@ -452,6 +455,84 @@ class AddMissingPropertiesTest extends WorseTestCase
                     public function hello()
                     {
                         $this->bar = $this->bar();
+                    }
+
+                    public function bar(): string
+                    {
+                    }
+                }
+                EOT
+        ];
+
+        yield 'It adds missing property from array assignment' => [
+            <<<'EOT'
+                <?php
+
+                class Foobar
+                {
+                    public function hello()
+                    {
+                        $this->bar['foo'] = $this->bar();
+                    }
+
+                    public function bar(): string
+                    {
+                    }
+                }
+                EOT
+            ,
+            <<<'EOT'
+                <?php
+
+                class Foobar
+                {
+                    /**
+                     * @var array<string,string>
+                     */
+                    private $bar = [];
+
+                    public function hello()
+                    {
+                        $this->bar['foo'] = $this->bar();
+                    }
+
+                    public function bar(): string
+                    {
+                    }
+                }
+                EOT
+        ];
+
+        yield 'It adds missing property from array add' => [
+            <<<'EOT'
+                <?php
+
+                class Foobar
+                {
+                    public function hello()
+                    {
+                        $this->bar[] = $this->bar();
+                    }
+
+                    public function bar(): string
+                    {
+                    }
+                }
+                EOT
+            ,
+            <<<'EOT'
+                <?php
+
+                class Foobar
+                {
+                    /**
+                     * @var string[]
+                     */
+                    private $bar = [];
+
+                    public function hello()
+                    {
+                        $this->bar[] = $this->bar();
                     }
 
                     public function bar(): string

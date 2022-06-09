@@ -3,13 +3,14 @@
 namespace Phpactor\WorseReflection\Core\Reflector\SourceCode;
 
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\ReflectionNavigation;
+use Phpactor\WorseReflection\Core\Diagnostics;
 use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionFunctionCollection;
 use Phpactor\WorseReflection\Core\Reflector\SourceCodeReflector;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionOffset;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethodCall;
 use Phpactor\WorseReflection\Core\SourceCodeLocator\TemporarySourceLocator;
 use Phpactor\WorseReflection\Core\SourceCode;
-use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassLikeCollection;
 
 class ContextualSourceCodeReflector implements SourceCodeReflector
 {
@@ -23,7 +24,7 @@ class ContextualSourceCodeReflector implements SourceCodeReflector
         $this->locator = $locator;
     }
     
-    public function reflectClassesIn($sourceCode): ReflectionClassCollection
+    public function reflectClassesIn($sourceCode): ReflectionClassLikeCollection
     {
         $sourceCode = SourceCode::fromUnknown($sourceCode);
         $this->locator->pushSourceCode($sourceCode);
@@ -66,5 +67,12 @@ class ContextualSourceCodeReflector implements SourceCodeReflector
     public function navigate($sourceCode): ReflectionNavigation
     {
         return $this->innerReflector->navigate($sourceCode);
+    }
+
+    public function diagnostics($sourceCode): Diagnostics
+    {
+        $sourceCode = SourceCode::fromUnknown($sourceCode);
+        $this->locator->pushSourceCode($sourceCode);
+        return $this->innerReflector->diagnostics($sourceCode);
     }
 }

@@ -95,11 +95,9 @@ class WorseGenerateMethod implements GenerateMethod
         $reflectionClass = $methodCall->class();
         $builder = $this->factory->fromSource($reflectionClass->sourceCode());
 
-        if ($reflectionClass->isClass()) {
-            $classBuilder = $builder->class($reflectionClass->name()->short());
-        } else {
-            $classBuilder = $builder->interface($reflectionClass->name()->short());
-        }
+        $classBuilder = $reflectionClass->isClass() ?
+            $builder->class($reflectionClass->name()->short()) :
+            $builder->interface($reflectionClass->name()->short());
 
         $methodBuilder = $classBuilder->method($methodName);
         $methodBuilder->visibility((string) $visibility);
@@ -114,7 +112,7 @@ class WorseGenerateMethod implements GenerateMethod
             $argumentBuilder = $methodBuilder->parameter($argument->guessName());
 
             if ($type->isDefined()) {
-                $argumentBuilder->type($type->short());
+                $argumentBuilder->type($type->short(), $type);
 
                 foreach ($type->classNamedTypes() as $classType) {
                     $builder->use($classType->toPhpString());
@@ -124,7 +122,7 @@ class WorseGenerateMethod implements GenerateMethod
 
         $inferredType = $methodCall->inferredReturnType();
         if ($inferredType->isDefined()) {
-            $methodBuilder->returnType($inferredType->toPhpString());
+            $methodBuilder->returnType($inferredType->toPhpString(), $inferredType);
             // this will not render localized types see https://github.com/phpactor/phpactor/issues/1453
             // if ($inferredType->__toString() !== $inferredType->toPhpString()) {
             //     $methodBuilder->docblock('@return ' . $inferredType->__toString());

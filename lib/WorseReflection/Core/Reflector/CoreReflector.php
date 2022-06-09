@@ -4,6 +4,7 @@ namespace Phpactor\WorseReflection\Core\Reflector;
 
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\ReflectionNavigation;
 use Phpactor\WorseReflection\Core\ClassName;
+use Phpactor\WorseReflection\Core\Diagnostics;
 use Phpactor\WorseReflection\Core\Exception\ClassNotFound;
 use Phpactor\WorseReflection\Core\Exception\FunctionNotFound;
 use Phpactor\WorseReflection\Core\Exception\NotFound;
@@ -21,7 +22,7 @@ use Phpactor\WorseReflection\Core\Reflection\ReflectionClassLike;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethodCall;
 use Phpactor\WorseReflection\Core\Inference\Frame;
 use Microsoft\PhpParser\Node\Expression\Variable;
-use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionClassLikeCollection;
 use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionFunctionCollection;
 
 class CoreReflector implements ClassReflector, SourceCodeReflector, FunctionReflector
@@ -155,7 +156,7 @@ class CoreReflector implements ClassReflector, SourceCodeReflector, FunctionRefl
     /**
      * Reflect all classes (or class-likes) in the given source code.
      */
-    public function reflectClassesIn($sourceCode): ReflectionClassCollection
+    public function reflectClassesIn($sourceCode): ReflectionClassLikeCollection
     {
         return $this->sourceReflector->reflectClassesIn($sourceCode);
     }
@@ -230,5 +231,10 @@ class CoreReflector implements ClassReflector, SourceCodeReflector, FunctionRefl
     public function sourceCodeForClassLike($name): SourceCode
     {
         return $this->sourceLocator->locate(Name::fromUnknown($name));
+    }
+
+    public function diagnostics($sourceCode): Diagnostics
+    {
+        return $this->sourceReflector->diagnostics($sourceCode);
     }
 }

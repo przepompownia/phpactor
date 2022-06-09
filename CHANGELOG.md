@@ -5,6 +5,8 @@ Changelog
 
 Bug fixes:
 
+  - [wr] Inconsistent type resolution - removed node level cache #1673
+  - [in] Fix exception when indexed file has no path #1643
   - [wr] Do not complete constants on class instance #1614
   - [wr] Include virtual properties in class members #1623
   - [wr] Fix false positive for virutal method not existing #1603
@@ -34,6 +36,7 @@ Bug fixes:
 
 Improvements:
 
+  - [ct] Add missing properties for array assignments #1640
   - [cmp] Provide variables from parent frame for anonymous use #1602
   - [ref] Increase reference finder timeout to 1 minute by default #1579
   - [cmp] Improved contextual completion
@@ -74,6 +77,12 @@ Improvements:
 
 Features:
 
+  - [wr] Added native WR single-pass diagnostics #1700
+  - [cmd] Index clean command #1691 @mamazu
+  - [cmp] (re?)support completion on parent:: #1643
+  - [cb] Render types based on PHP version #1655
+  - [wr] Support `@property-read`
+  - [wr] Support for mixins #990
   - [rf] Support for constants, properties and promoted properties
   - [compl] Docblock completion
   - [wr] Support for intersection types

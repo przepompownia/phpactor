@@ -25,8 +25,9 @@ use Microsoft\PhpParser\Node\Statement\ExpressionStatement;
 use Phpactor\WorseReflection\Core\Type;
 use Phpactor\WorseReflection\Core\TypeFactory;
 use Phpactor\WorseReflection\Core\Type\AggregateType;
+use Phpactor\WorseReflection\Core\Type\ArrayAccessType;
 use Phpactor\WorseReflection\Core\Type\ArrayLiteral;
-use Phpactor\WorseReflection\Core\Type\ArrayShapeType;
+use Phpactor\WorseReflection\Core\Type\ArrayType;
 use Phpactor\WorseReflection\Core\Type\Literal;
 use Phpactor\WorseReflection\Core\Type\MissingType;
 use Phpactor\WorseReflection\Core\Type\StringType;
@@ -87,7 +88,7 @@ class AssignmentExpressionResolver implements Resolver
             ]
         );
 
-        $frame->locals()->add(WorseVariable::fromSymbolContext($context)->asAssignment());
+        $frame->locals()->set(WorseVariable::fromSymbolContext($context)->asAssignment());
     }
 
     private function walkMemberAccessExpression(
@@ -131,7 +132,7 @@ class AssignmentExpressionResolver implements Resolver
             ]
         );
 
-        $frame->properties()->add(WorseVariable::fromSymbolContext($context));
+        $frame->properties()->set(WorseVariable::fromSymbolContext($context));
     }
 
     private function walkArrayCreation(Frame $frame, ArrayCreationExpression $leftOperand, NodeContext $symbolContext): void
@@ -170,10 +171,15 @@ class AssignmentExpressionResolver implements Resolver
                     $accessType = $resolver->resolveNode($frame, $leftOperand->accessExpression)->type();
 
                     if (!$accessType instanceof Literal) {
+                        $frame->locals()->set(
+                            $variable->withType(
+                                new ArrayType(TypeFactory::undefined(), $rightContext->type())
+                            )
+                        );
                         return;
                     }
 
-                    $frame->locals()->add(
+                    $frame->locals()->set(
                         $variable->withType(
                             $type->set($accessType->value(), $rightContext->type())
                         )->withOffset($leftOperand->getStartPosition())
@@ -183,7 +189,7 @@ class AssignmentExpressionResolver implements Resolver
 
                 // array addition `$foo[] = `
                 // @phpstan-ignore-next-line TP lies
-                $frame->locals()->add(
+                $frame->locals()->set(
                     $variable->withType(
                         $type->add($rightContext->type())
                     )->withOffset($leftOperand->getStartPosition())
@@ -209,7 +215,7 @@ class AssignmentExpressionResolver implements Resolver
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -223,18 +229,18 @@ class AssignmentExpressionResolver implements Resolver
             if (!$element instanceof ArrayElement) {
                 continue;
             }
-        
+
             $index++;
             $elementValue = $element->elementValue;
             if (!$elementValue instanceof Variable) {
                 continue;
             }
-        
+
             /** @phpstan-ignore-next-line */
             if (null === $elementValue || null === $elementValue->name) {
                 continue;
             }
-        
+
             $varName = NodeUtil::nameFromTokenOrNode($leftOperand, $elementValue->name);
 
             $variableContext = NodeContextFactory::create(
@@ -248,17 +254,13 @@ class AssignmentExpressionResolver implements Resolver
 
 
             $variableContext = $variableContext->withType($this->offsetType($type, $index));
-            $frame->locals()->add(WorseVariable::fromSymbolContext($variableContext));
+            $frame->locals()->set(WorseVariable::fromSymbolContext($variableContext));
         }
     }
 
     private function offsetType(Type $type, int $index): Type
     {
-        if ($type instanceof ArrayShapeType) {
-            return $type->typeAtOffset($index);
-        }
-
-        if ($type instanceof ArrayLiteral) {
+        if ($type instanceof ArrayAccessType) {
             return $type->typeAtOffset($index);
         }
 

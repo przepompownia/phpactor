@@ -2,6 +2,12 @@
 
 namespace Phpactor\Extension\CodeTransform;
 
+use Phpactor\CodeBuilder\Adapter\WorseReflection\TypeRenderer\WorseTypeRenderer;
+use Phpactor\CodeBuilder\Adapter\WorseReflection\TypeRenderer\WorseTypeRenderer74;
+use Phpactor\CodeBuilder\Adapter\WorseReflection\TypeRenderer\WorseTypeRenderer80;
+use Phpactor\CodeBuilder\Adapter\WorseReflection\TypeRenderer\WorseTypeRenderer81;
+use Phpactor\CodeBuilder\Adapter\WorseReflection\TypeRenderer\WorseTypeRenderer82;
+use Phpactor\CodeBuilder\Adapter\WorseReflection\TypeRenderer\WorseTypeRendererFactory;
 use Phpactor\CodeBuilder\Domain\BuilderFactory;
 use Phpactor\CodeBuilder\Domain\Updater;
 use Phpactor\CodeBuilder\Util\TextFormat;
@@ -18,7 +24,6 @@ use Phpactor\CodeTransform\Adapter\TolerantParser\Refactor\TolerantExtractExpres
 use Phpactor\CodeTransform\Adapter\WorseReflection\GenerateFromExisting\InterfaceFromExistingGenerator;
 use Phpactor\CodeTransform\Adapter\TolerantParser\Refactor\TolerantRenameVariable;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseMissingMethodFinder;
-use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseUnresolvableClassNameFinder;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseExtractMethod;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Refactor\WorseOverrideMethod;
 use Phpactor\CodeTransform\Adapter\WorseReflection\Helper\WorseInterestingOffsetFinder;
@@ -34,7 +39,6 @@ use Phpactor\CodeTransform\CodeTransform;
 use Phpactor\CodeTransform\Domain\Generators;
 use Phpactor\CodeTransform\Domain\Helper\InterestingOffsetFinder;
 use Phpactor\CodeTransform\Domain\Helper\MissingMethodFinder;
-use Phpactor\CodeTransform\Domain\Helper\UnresolvableClassNameFinder;
 use Phpactor\CodeTransform\Domain\Refactor\ChangeVisiblity;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractConstant;
 use Phpactor\CodeTransform\Domain\Refactor\ExtractExpression;
@@ -228,12 +232,6 @@ class CodeTransformExtension implements Extension
         $container->register(ChangeVisiblity::class, function (Container $container) {
             return new TolerantChangeVisiblity();
         });
-
-        $container->register(UnresolvableClassNameFinder::class, function (Container $container) {
-            return new WorseUnresolvableClassNameFinder(
-                $container->get(WorseReflectionExtension::SERVICE_REFLECTOR)
-            );
-        });
     }
 
     private function registerGeneratorImplementations(ContainerBuilder $container): void
@@ -285,8 +283,7 @@ class CodeTransformExtension implements Extension
         });
         $container->register(MissingMethodFinder::class, function (Container $container) {
             return new WorseMissingMethodFinder(
-                $container->get(WorseReflectionExtension::SERVICE_REFLECTOR),
-                $container->get(WorseReflectionExtension::SERVICE_PARSER)
+                $container->get(WorseReflectionExtension::SERVICE_REFLECTOR)
             );
         });
     }
@@ -319,9 +316,24 @@ class CodeTransformExtension implements Extension
                 'autoescape' => false,
             ]);
             $renderer = new TwigRenderer($twig);
-            $twig->addExtension(new TwigExtension($renderer, $container->get(TextFormat::class)));
+            $twig->addExtension(new TwigExtension(
+                $container->get(TextFormat::class),
+                $container->get(WorseTypeRenderer::class)
+            ));
 
             return $renderer;
+        });
+
+        $container->register(WorseTypeRenderer::class, function (Container $container) {
+            $version = $container->get(PhpVersionResolver::class);
+            assert($version instanceof PhpVersionResolver);
+            $version = $version->resolve();
+            return (new WorseTypeRendererFactory([
+                '7.4' => new WorseTypeRenderer74(),
+                '8.0' => new WorseTypeRenderer80(),
+                '8.1' => new WorseTypeRenderer81(),
+                '8.2' => new WorseTypeRenderer82(),
+            ]))->rendererFor($version);
         });
 
         $container->register(TextFormat::class, function (Container $container) {
@@ -395,7 +407,7 @@ class CodeTransformExtension implements Extension
             );
         }, [ 'code_transform.transformer' => [ 'name' => 'fix_namespace_class_name' ]]);
 
-        $container->register('code_transform.transformer.add_missing_docblocks', function (Container $container) {
+        $container->register(UpdateDocblockTransformer::class, function (Container $container) {
             return new UpdateDocblockTransformer(
                 $container->get(WorseReflectionExtension::SERVICE_REFLECTOR),
                 $container->get(Updater::class),
@@ -404,7 +416,7 @@ class CodeTransformExtension implements Extension
             );
         }, [ 'code_transform.transformer' => [ 'name' => 'add_missing_docblocks' ]]);
 
-        $container->register('code_transform.transformer.add_missing_return_types', function (Container $container) {
+        $container->register(UpdateReturnTypeTransformer::class, function (Container $container) {
             return new UpdateReturnTypeTransformer(
                 $container->get(WorseReflectionExtension::SERVICE_REFLECTOR),
                 $container->get(Updater::class),

@@ -38,7 +38,7 @@ class FunctionLikeWalker implements Walker
         ];
     }
 
-    public function walk(FrameResolver $resolver, Frame $frame, Node $node): Frame
+    public function enter(FrameResolver $resolver, Frame $frame, Node $node): Frame
     {
         assert(
             $node instanceof MethodDeclaration ||
@@ -53,6 +53,11 @@ class FunctionLikeWalker implements Walker
 
         $this->walkFunctionLike($resolver, $frame, $node);
 
+        return $frame;
+    }
+
+    public function exit(FrameResolver $resolver, Frame $frame, Node $node): Frame
+    {
         return $frame;
     }
 
@@ -104,7 +109,7 @@ class FunctionLikeWalker implements Walker
                 ]
             );
 
-            $frame->locals()->add(Variable::fromSymbolContext($context));
+            $frame->locals()->set(Variable::fromSymbolContext($context));
         }
     }
 
@@ -144,7 +149,7 @@ class FunctionLikeWalker implements Walker
             // add it with above context and continue
             // TODO: Do we infer the type hint??
             if (0 === $parentVars->byName($varName)->count()) {
-                $frame->locals()->add(Variable::fromSymbolContext($variableContext));
+                $frame->locals()->set(Variable::fromSymbolContext($variableContext));
                 continue;
             }
 
@@ -153,7 +158,7 @@ class FunctionLikeWalker implements Walker
             $variableContext = $variableContext
                 ->withType($variable->type());
 
-            $frame->locals()->add(Variable::fromSymbolContext($variableContext));
+            $frame->locals()->set(Variable::fromSymbolContext($variableContext));
         }
     }
 
@@ -191,7 +196,7 @@ class FunctionLikeWalker implements Walker
         );
         
         // add this and self
-        $frame->locals()->add(Variable::fromSymbolContext($context));
+        $frame->locals()->set(Variable::fromSymbolContext($context));
 
         if (!$classType instanceof ReflectedClassType) {
             return;
@@ -202,7 +207,7 @@ class FunctionLikeWalker implements Walker
         }
         foreach ($reflection->members()->byMemberType(ReflectionMember::TYPE_PROPERTY) as $property) {
             assert($property instanceof ReflectionProperty);
-            $frame->properties()->add(new Variable($property->name(), $property->position()->start(), $property->inferredType(), $classType));
+            $frame->properties()->set(new Variable($property->name(), $property->position()->start(), $property->inferredType(), $classType));
         }
     }
 }

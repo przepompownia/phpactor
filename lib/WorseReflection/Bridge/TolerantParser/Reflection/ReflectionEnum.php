@@ -4,9 +4,9 @@ namespace Phpactor\WorseReflection\Bridge\TolerantParser\Reflection;
 
 use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\Statement\EnumDeclaration;
-use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\Collection\ReflectionEnumCaseCollection as PhpactorReflectionEnumCaseCollection;
-use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\Collection\ReflectionMethodCollection;
-use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\Collection\ReflectionPropertyCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionEnumCaseCollection as PhpactorReflectionEnumCaseCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionMethodCollection;
+use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionPropertyCollection;
 use Phpactor\WorseReflection\Core\ClassName;
 use Phpactor\WorseReflection\Core\Reflection\Collection\ChainReflectionMemberCollection;
 use Phpactor\WorseReflection\Core\Reflection\Collection\ReflectionEnumCaseCollection;
@@ -95,9 +95,8 @@ class ReflectionEnum extends AbstractReflectionClass implements CoreReflectionEn
     public function docblock(): DocBlock
     {
         return $this->serviceLocator->docblockFactory()->create(
-            new ClassLikeTypeResolver($this),
             $this->node()->getLeadingCommentAndWhitespaceText()
-        );
+        )->withTypeResolver(new ClassLikeTypeResolver($this));
     }
 
     /**

@@ -4,8 +4,8 @@ namespace Phpactor\WorseReflection\Core\Inference;
 
 use Closure;
 use Phpactor\WorseReflection\Core\Type;
-use Phpactor\WorseReflection\Core\TypeFactory;
 use Phpactor\WorseReflection\Core\Type\MissingType;
+use Phpactor\WorseReflection\Core\Type\VoidType;
 
 class Frame
 {
@@ -28,6 +28,8 @@ class Frame
     private string $name;
 
     private ?Type $returnType = null;
+
+    private int $version = 1;
 
     public function __construct(
         string $name,
@@ -111,17 +113,10 @@ class Frame
         return $this->name;
     }
 
-    public function withLocals(LocalAssignments $locals): self
-    {
-        $new = clone $this;
-        $new->locals = $locals;
-
-        return $new;
-    }
-
     public function withReturnType(Type $type): self
     {
         $this->returnType = $type;
+        $this->version++;
         return $this;
     }
 
@@ -147,57 +142,27 @@ class Frame
 
                 $type = $variable->type();
 
-                $frameVariables->add($variable);
+                $frameVariables->set($variable);
             }
-        }
-    }
-
-    public function restoreToStateBefore(int $before, int $after): void
-    {
-        $locals = [];
-        // get most recent state of variables before offset
-        foreach ($this->locals()->lessThan($before) as $local) {
-            $locals[$local->name()] = $local;
-        }
-
-        // find any variables that were reassigned in the range
-        foreach ($this->locals()->greaterThanOrEqualTo($before)->lessThanOrEqualTo($after) as $extra) {
-
-            // if it was defined before then restore it
-            if (isset($locals[$extra->name()])) {
-
-                // it was assigned in the if block so
-                // combine it with the previous variable
-                if ($extra->wasAssigned()) {
-                    $this->locals()->add(
-                        $locals[$extra->name()]->withOffset(
-                            $after
-                        )->withType(
-                            $locals[$extra->name()]->type()->addType($extra->type())
-                        )
-                    );
-                    continue;
-                }
-
-                $this->locals()->add($locals[$extra->name()]->withOffset($after));
-                continue;
-            }
-
-            // otherwise set the type to undefined
-            $this->locals()->add($extra->withType(TypeFactory::undefined())->withOffset($after));
-        }
-
-        $properties = [];
-        foreach ($this->properties() as $property) {
-            $properties[$property->name()] = $property;
-        }
-        foreach ($properties as $property) {
-            $this->properties()->add($property);
         }
     }
 
     public function returnType(): Type
     {
-        return $this->returnType ?: new MissingType();
+        return $this->returnType ?: new VoidType();
+    }
+
+    /**
+     * The version is incremented when the frame or one of it's components is
+     * modified and can be used for cache busting.
+     */
+    public function version(): string
+    {
+        return sprintf(
+            '%s-%s-%s',
+            $this->locals()->version(),
+            $this->properties()->version(),
+            $this->version
+        );
     }
 }

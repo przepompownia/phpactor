@@ -10,9 +10,9 @@ use Phpactor\CodeTransform\Domain\Diagnostics;
 use Phpactor\CodeTransform\Domain\SourceCode;
 use Phpactor\CodeTransform\Domain\Transformer;
 use Phpactor\TextDocument\TextEdits;
+use Phpactor\WorseReflection\Bridge\TolerantParser\Diagnostics\MissingReturnTypeDiagnostic;
 use Phpactor\WorseReflection\Core\Reflection\ReflectionMethod;
 use Phpactor\WorseReflection\Core\Type;
-use Phpactor\WorseReflection\Core\Type\VoidType;
 use Phpactor\WorseReflection\Reflector;
 
 class UpdateReturnTypeTransformer implements Transformer
@@ -47,7 +47,7 @@ class UpdateReturnTypeTransformer implements Transformer
                 $builder->use($classType->name());
             }
 
-            $methodBuilder->returnType($localReplacement->reduce()->toPhpString());
+            $methodBuilder->returnType($localReplacement->reduce()->toPhpString(), $localReplacement->reduce());
         }
 
         return $this->updater->textEditsFor($builder->build(), Code::fromString($code));
@@ -55,19 +55,19 @@ class UpdateReturnTypeTransformer implements Transformer
 
     public function diagnostics(SourceCode $code): Diagnostics
     {
+        $wrDiagnostics = $this->reflector->diagnostics($code->__toString())->byClass(MissingReturnTypeDiagnostic::class);
         $diagnostics = [];
 
-        $methods = $this->methodsThatNeedFixing($code);
+        /** @var MissingReturnTypeDiagnostic $diagnostic */
+        foreach ($wrDiagnostics as $diagnostic) {
+            if (!$diagnostic->returnType()->isDefined()) {
+                continue;
+            }
 
-        foreach ($methods as $method) {
-            $returnType = $this->returnType($method);
             $diagnostics[] = new Diagnostic(
-                $method->nameRange(),
-                sprintf(
-                    'Missing return type `%s`',
-                    $returnType->toLocalType($method->scope())->toPhpString(),
-                ),
-                Diagnostic::HINT
+                $diagnostic->range(),
+                $diagnostic->message(),
+                Diagnostic::WARNING,
             );
         }
 
@@ -80,33 +80,16 @@ class UpdateReturnTypeTransformer implements Transformer
      */
     private function methodsThatNeedFixing(SourceCode $code): array
     {
+        $diagnostics = $this->reflector->diagnostics($code->__toString())->byClass(MissingReturnTypeDiagnostic::class);
         $methods = [];
-        foreach ($this->reflector->reflectClassesIn($code->__toString()) as $class) {
-            if ($class->isInterface()) {
+        /** @var MissingReturnTypeDiagnostic $diagnostic */
+        foreach ($diagnostics as $diagnostic) {
+            if (!$diagnostic->returnType()->isDefined()) {
                 continue;
             }
-            foreach ($class->methods()->belongingTo($class->name()) as $method) {
-                if ($method->isAbstract()) {
-                    continue;
-                }
-                if ($method->name() === '__construct') {
-                    continue;
-                }
 
-                if ($method->type()->isDefined()) {
-                    continue;
-                }
-
-                if ($method->docblock()->returnType()->isMixed()) {
-                    continue;
-                }
-
-                if ($method->class()->templateMap()->has($method->docblock()->returnType()->__toString())) {
-                    continue;
-                }
-
-                $methods[] = $method;
-            }
+            $class = $this->reflector->reflectClassLike($diagnostic->classType());
+            $methods[] = $class->methods()->get($diagnostic->methodName());
         }
 
         return $methods;
@@ -115,9 +98,6 @@ class UpdateReturnTypeTransformer implements Transformer
     private function returnType(ReflectionMethod $method): Type
     {
         $returnType = $method->frame()->returnType();
-        if (!$returnType->isDefined()) {
-            return new VoidType();
-        }
         return $returnType;
     }
 }
