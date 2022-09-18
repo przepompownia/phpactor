@@ -1,0 +1,30 @@
+// File: source
+
+<?php
+
+class MyClass
+{
+    public function thisIsSparta(string $f<>oo)
+    {
+    }
+
+    public function testNamedArg()
+    {
+        $this->thisIsSparta(foo: 'x')
+    }
+}
+// File: expected
+<?php
+
+class MyClass
+{
+    public function thisIsSparta(string $newName)
+    {
+        $newName = some_thing();
+    }
+
+    public function testNamedArg()
+    {
+        $this->thisIsSparta(newName: 'x')
+    }
+}

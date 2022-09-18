@@ -62,6 +62,11 @@ class TolerantRenameVariableTest extends TolerantTestCase
                 'newName',
                 RenameVariable::SCOPE_LOCAL
             ],
+            'named argument' => [
+                'renameVariable8.test',
+                'newName',
+                RenameVariable::SCOPE_LOCAL
+            ],
         ];
     }
 }
