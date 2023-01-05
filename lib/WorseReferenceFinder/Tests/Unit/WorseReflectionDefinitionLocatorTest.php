@@ -330,6 +330,27 @@ class WorseReflectionDefinitionLocatorTest extends DefinitionLocatorTestCase
         );
     }
 
+    public function testLocatesCallableClass(): void
+    {
+        // , '<?php $bar = new Foobar(); $bar<>();');
+        $location = $this->locate(<<<'EOT'
+            // File: Foobar.php
+            <?php class Foobar {public function __invoke(){}}
+            EOT
+            , <<<'EOT'
+            // File: Barfoo.php
+            <?php class Barfoo {private Foobar $foobar; public function x() { $b = new Foobar; $b<>(); ($this->foobar)(); }}
+            EOT
+        );
+
+        self::assertEquals(1, $location->count());
+
+        self::assertEquals(
+            40,
+            $location->first()->location()->offset()->toInt()
+        );
+    }
+
     public function testLocatesNullableProperty(): void
     {
         $location = $this->locate(<<<'EOT'

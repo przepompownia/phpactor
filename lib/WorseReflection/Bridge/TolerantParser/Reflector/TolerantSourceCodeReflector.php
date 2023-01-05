@@ -2,6 +2,7 @@
 
 namespace Phpactor\WorseReflection\Bridge\TolerantParser\Reflector;
 
+use Microsoft\PhpParser\Node\Expression\CallExpression;
 use Microsoft\PhpParser\Node\SourceFileNode;
 use Phpactor\TextDocument\TextDocument;
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\ReflectionNavigation;
@@ -51,10 +52,12 @@ class TolerantSourceCodeReflector implements SourceCodeReflector
         $rootNode = $this->parseSourceCode($sourceCode);
         $node = $rootNode->getDescendantNodeAtPosition($offset->toInt());
 
-        $resolver = $this->serviceLocator->symbolContextResolver();
-        $frame = $this->serviceLocator->frameBuilder()->build($node);
+        $callExpression = $node->getFirstAncestor(CallExpression::class);
 
-        return TolerantReflectionOffset::fromFrameAndSymbolContext($frame, $resolver->resolveNode($frame, $node));
+        $resolver = $this->serviceLocator->symbolContextResolver();
+        $frame = $this->serviceLocator->frameBuilder()->build($callExpression ?? $node);
+
+        return TolerantReflectionOffset::fromFrameAndSymbolContext($frame, $resolver->resolveNode($frame, $callExpression ?? $node));
     }
 
     /**
