@@ -53,11 +53,32 @@ class FileRenamer implements PhpactorFileRenamer
                 continue;
             }
 
-            foreach ($this->mover->replaceReferences(
-                $this->mover->findReferences($document->__toString(), $fromClass),
-                $toClass
-            ) as $edit) {
-                yield new LocatedTextEdit($reference->location()->uri(), $edit);
+            $references = $this->client->class()->referencesTo($fromClass);
+
+            // rename class definition
+            $locatedEdits = $this->replaceDefinition($to, $fromClass, $toClass);
+
+            $edits = TextEdits::none();
+            $seen = [];
+            foreach ($references as $reference) {
+                if (isset($seen[$reference->location()->uri()->__toString()])) {
+                    continue;
+                }
+
+                $seen[$reference->location()->uri()->__toString()] = true;
+
+                try {
+                    $document = $this->locator->get($reference->location()->uri());
+                } catch (TextDocumentNotFound) {
+                    continue;
+                }
+
+                foreach ($this->mover->replaceReferences(
+                    $this->mover->findReferences($document->__toString(), $fromClass),
+                    $toClass
+                ) as $edit) {
+                    $locatedEdits[] = new LocatedTextEdit($reference->location()->uri(), $edit);
+                }
             }
         }
 
