@@ -14,6 +14,7 @@ use Microsoft\PhpParser\Node\ClassMembersNode;
 use Microsoft\PhpParser\Node\ConstElement;
 use Microsoft\PhpParser\Node\DelimitedList\MatchArmConditionList;
 use Microsoft\PhpParser\Node\DelimitedList\QualifiedNameList;
+use Microsoft\PhpParser\Node\EnumCaseDeclaration;
 use Microsoft\PhpParser\Node\Expression;
 use Microsoft\PhpParser\Node\Expression\AnonymousFunctionCreationExpression;
 use Microsoft\PhpParser\Node\Expression\Variable;
@@ -62,6 +63,7 @@ class CompletionContext
             $parent instanceof StatementNode ||
             $parent instanceof ConstElement ||
             $parent instanceof MatchArmConditionList ||
+            $parent instanceof EnumCaseDeclaration ||
             $parent instanceof MatchArm ||
             $parent instanceof ArrayElement // yield;
         ;
@@ -165,6 +167,10 @@ class CompletionContext
         }
 
         if ($node->parent instanceof ConstElement) {
+            return false;
+        }
+
+        if ($node->parent instanceof EnumCaseDeclaration) {
             return false;
         }
 

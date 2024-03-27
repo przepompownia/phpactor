@@ -137,6 +137,20 @@ class ExpressionNameCompletorTest extends IntegrationTestCase
             },
         ];
 
+        yield 'class constant inside enum case' => [
+            [
+                NameSearchResult::create('class', 'Foobar'),
+                NameSearchResult::create('class', 'Class'),
+                NameSearchResult::create('class', 'FOOBAR'),
+            ],
+            '<?php enum Foobar: string { case BAR = F<>  }',
+            function (Suggestions $suggestions): void {
+                self::assertCount(1, $suggestions);
+                self::assertEquals(Suggestion::TYPE_CONSTANT, $suggestions->at(0)->type());
+                self::assertEquals('FOO', $suggestions->at(0)->name());
+            }
+        ];
+
         yield 'class constant inside class constant declaration' => [
             [
                 NameSearchResult::create('class', 'Foobar'),
