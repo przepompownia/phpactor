@@ -7,9 +7,12 @@ use ArrayIterator;
 /**
  * @extends ArrayIterator<int, LocatedTextEditsMap|RenameResult>
  */
-class RenameEdit extends ArrayIterator
+class WorkspaceRenameEdits extends ArrayIterator
 {
-    public function __construct(LocatedTextEditsMap|RenameResult|null ...$edits)
+    /**
+     * @param list<LocatedTextEditsMap|RenameResult> $edits
+     */
+    public function __construct(array $edits)
     {
         assert(array_is_list($edits));
 
