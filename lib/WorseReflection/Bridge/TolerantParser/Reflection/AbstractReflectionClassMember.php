@@ -22,7 +22,6 @@ use Microsoft\PhpParser\Node\MethodDeclaration;
 use Microsoft\PhpParser\Node\PropertyDeclaration;
 use Microsoft\PhpParser\Node\ClassConstDeclaration;
 use InvalidArgumentException;
-use RuntimeException;
 
 abstract class AbstractReflectionClassMember extends AbstractReflectedNode implements ReflectionMember
 {
@@ -117,43 +116,26 @@ abstract class AbstractReflectionClassMember extends AbstractReflectedNode imple
     {
         $found = false;
 
-        foreach ($this->node()->getDescendantNodesAndTokens() as $token) {
-            if (!$token instanceof Token) {
-                continue;
-            }
-
-            if (false === $found) {
-                if (!$token instanceof Token || $token->kind !== $tokenBeforeKind) {
-                    continue;
+        foreach ($this->node()->getDescendantTokens() as $token) {
+            if (true === $found) {
+                if ($tokenBeforeKind !== TokenKind::ConstKeyword) {
+                    return $token->kind === TokenKind::Name ? $token : null;
                 }
 
-                if ($tokenBeforeKind === TokenKind::VariableName) {
+                if ($token->kind === TokenKind::Name && $token->getText($this->node()->getFileContents()) === $this->name()) {
                     return $token;
                 }
+            }
 
-                $found = true;
+            if ($token->kind !== $tokenBeforeKind) {
                 continue;
             }
 
-            if ($tokenBeforeKind !== TokenKind::ConstKeyword && $token->kind === TokenKind::Name) {
+            if ($tokenBeforeKind === TokenKind::VariableName) {
                 return $token;
             }
 
-            if ($tokenBeforeKind !== TokenKind::ConstKeyword) {
-                return null;
-            }
-
-            if ($token->kind !== TokenKind::Name) {
-                continue;
-            }
-
-            $tokenText = $token->getText($this->node()->getRoot()->getText());
-
-            if ($tokenText !== $this->name()) {
-                continue;
-            }
-
-            return $token;
+            $found = true;
         }
 
         return null;
