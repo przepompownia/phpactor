@@ -14,14 +14,12 @@ use Phpactor\Indexer\Model\RecordReference;
 use Phpactor\Indexer\Model\Record\ClassRecord;
 use Phpactor\Indexer\Model\Record\FileRecord;
 use Phpactor\Rename\Model\LocatedTextEdits;
-use Phpactor\Rename\Model\LocatedTextEditsMap;
 use Phpactor\Rename\Model\RenameResult;
 use Phpactor\TextDocument\TextDocument;
 use Phpactor\TextDocument\TextDocumentBuilder;
 use Phpactor\TextDocument\TextDocumentLocator\InMemoryDocumentLocator;
 use Phpactor\TextDocument\TextDocumentUri;
 use function Amp\Promise\wait;
-use function PHPUnit\Framework\assertEquals;
 use function Safe\sprintf;
 
 class FileRenamerTest extends IntegrationTestCase
