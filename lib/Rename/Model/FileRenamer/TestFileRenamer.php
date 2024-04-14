@@ -13,13 +13,13 @@ use Phpactor\TextDocument\TextDocumentUri;
 
 class TestFileRenamer implements FileRenamer
 {
-    private WorkspaceOperations $renameEdit;
+    private WorkspaceOperations $workspaceOperations;
 
     public function __construct(
         private bool $throw = false,
-        ?WorkspaceOperations $renameEdit = null,
+        ?WorkspaceOperations $workspaceOperations = null,
     ) {
-        $this->renameEdit = $renameEdit ?: new WorkspaceOperations(
+        $this->workspaceOperations = $workspaceOperations ?: new WorkspaceOperations(
             LocatedTextEditsMap::create()->toLocatedTextEdits(),
         );
     }
@@ -30,6 +30,6 @@ class TestFileRenamer implements FileRenamer
             return new Failure(new CouldNotRename('There was a problem'));
         }
 
-        return new Success($this->renameEdit);
+        return new Success($this->workspaceOperations);
     }
 }
