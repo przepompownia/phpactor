@@ -57,7 +57,9 @@ class FileRenameHandler implements Handler, CanRegisterCapabilities
                 $previous = $error->getPrevious();
 
                 $this->clientApi->window()->showMessage()->error(sprintf(
-                    $error->getMessage() . ($previous?->getTraceAsString() ?? '')
+                    '%s %s',
+                    $error->getMessage(),
+                    $previous?->getTraceAsString() ?? '',
                 ));
 
                 return new WorkspaceEdit(null, []);
