@@ -13,6 +13,7 @@ use Phpactor\Indexer\Model\QueryClient;
 use Phpactor\Indexer\Model\RecordReference;
 use Phpactor\Indexer\Model\Record\ClassRecord;
 use Phpactor\Indexer\Model\Record\FileRecord;
+use Phpactor\Rename\Model\LocatedTextEdits;
 use Phpactor\Rename\Model\LocatedTextEditsMap;
 use Phpactor\Rename\Model\RenameResult;
 use Phpactor\TextDocument\TextDocument;
@@ -20,6 +21,8 @@ use Phpactor\TextDocument\TextDocumentBuilder;
 use Phpactor\TextDocument\TextDocumentLocator\InMemoryDocumentLocator;
 use Phpactor\TextDocument\TextDocumentUri;
 use function Amp\Promise\wait;
+use function PHPUnit\Framework\assertEquals;
+use function Safe\sprintf;
 
 class FileRenamerTest extends IntegrationTestCase
 {
@@ -51,14 +54,18 @@ class FileRenamerTest extends IntegrationTestCase
            ]
         );
 
-        $edits = wait($renamer->renameFile($document1->uriOrThrow(), $document2->uriOrThrow()));
+        $newUri = $document2->uriOrThrow();
+        $edits = wait($renamer->renameFile($document1->uriOrThrow(), $newUri));
 
         foreach ($edits as $edit) {
-            if ($edit instanceof RenameResult) {
-
-            }
-            if ($edit instanceof LocatedTextEditsMap) {
-                self::assertCount(3, $edit->toLocatedTextEdits(), 'Locates two references');
+            switch ($edit::class) {
+                case RenameResult::class:
+                    self::assertSame($newUri, $edit->newUri());
+                    break;
+                case LocatedTextEdits::class:
+                    break;
+                default:
+                    self::fail(sprintf('WorkspaceOperations element has invalid type: %s', $edit::class));
             }
         }
     }
