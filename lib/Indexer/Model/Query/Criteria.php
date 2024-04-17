@@ -6,8 +6,7 @@ use Phpactor\Indexer\Model\Query\Criteria\AndCriteria;
 use Phpactor\Indexer\Model\Query\Criteria\FileAbsolutePathBeginsWith;
 use Phpactor\Indexer\Model\Query\Criteria\HasFlags;
 use Phpactor\Indexer\Model\Query\Criteria\IsClassType;
-use Phpactor\Indexer\Model\Query\Criteria\ShortNameBeginsOrCamelMatchesTo;
-use Phpactor\Indexer\Model\Query\Criteria\ShortNameBeginsOrFuzzilyMatchesWith;
+use Phpactor\Indexer\Model\Query\Criteria\ShortNameMatchesTo;
 use Phpactor\Indexer\Model\Query\Criteria\ShortNameContains;
 use Phpactor\Indexer\Model\Query\Criteria\ExactShortName;
 use Phpactor\Indexer\Model\Query\Criteria\FqnBeginsWith;
@@ -34,14 +33,9 @@ abstract class Criteria
         return new ShortNameBeginsWith($name);
     }
 
-    public static function shortNameFuzzilyMatchesTo(string $name): ShortNameBeginsOrFuzzilyMatchesWith
+    public static function shortNameMatchesTo(string $name): ShortNameMatchesTo
     {
-        return new ShortNameBeginsOrFuzzilyMatchesWith($name);
-    }
-
-    public static function shortNameCamelMatchesTo(string $name): ShortNameBeginsOrCamelMatchesTo
-    {
-        return new ShortNameBeginsOrCamelMatchesTo($name);
+        return new ShortNameMatchesTo($name);
     }
 
     public static function fqnBeginsWith(string $name): FqnBeginsWith
