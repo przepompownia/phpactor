@@ -71,11 +71,39 @@ class KeywordCompletorTest extends TolerantCompletorTestCase
         ];
         yield 'method empty body keyword' => [
             '<?php class F { public function foo() { <> }}',
-            $this->expect(['return ', 'yield ']),
+            [...$this->expectStatement()],
         ];
         yield 'method body keyword' => [
             '<?php class F { public function foo() { re<> }}',
-            $this->expect(['return ', 'yield ']),
+            [...$this->expectStatement()],
+        ];
+        yield 'method body subnode' => [
+            '<?php class F { public function foo() { if (true) { re<> } }}',
+            [...$this->expectStatement()],
+        ];
+        yield 'root subnode' => [
+            '<?php <>',
+            [...$this->expectStatement()],
+        ];
+        yield 'namespace subnode' => [
+            '<?php namespace X; <>',
+            [...$this->expectStatement()],
+        ];
+        yield 'inside try' => [
+            '<?php namespace X; try { re<> } catch (\Exception $e) {}',
+            [...$this->expectStatement()],
+        ];
+        yield 'inside catch' => [
+            '<?php namespace X; try { } catch (\Exception $e) { re<> }',
+            [...$this->expectStatement()],
+        ];
+        yield 'inside case' => [
+            '<?php namespace X; switch (true) { case 0: <> }',
+            [...$this->expectStatement()],
+        ];
+        yield 'inside case 2' => [
+            '<?php namespace X; switch (true) { case 0: re<> }',
+            [...$this->expectStatement()],
         ];
     }
 
@@ -93,6 +121,29 @@ class KeywordCompletorTest extends TolerantCompletorTestCase
         return array_map(fn (string $keyword) => [
             'name' => $keyword,
         ], $array);
+    }
+
+    /**
+     * @return Generator<array{name:string,snippet:string}>
+     */
+    private function expectStatement(): Generator
+    {
+        $statements = [
+            'do' => " {\n\t\$0\n} while (\$2);",
+            'echo' => ' $1;$0',
+            'for' => " (\${1:expr1}, \${2:expr2}, \${3:expr3}) {\n\t\$0\n}",
+            'foreach' => " (\\\$\${1:expr} as \\\$\${2:key} => \\\$\${3:value}) {\$0\n}",
+            'if' => " (\$1) {\$0\n}",
+            'return' => ' $1;$0',
+            'switch' => " (\\\$\${1:expr}) {\n\tcase \${2:expr}:\n\t\t\$0\n}",
+            'try' => "  {\$3\n} catch (\${1:Exception} \\\$\${2:error}) {\$4\n}",
+            'while' => " (\$1) {\$0\n}",
+            'yield' => ' $1;$0',
+        ];
+
+        foreach ($statements as $name => $snippet) {
+            yield ['name' => $name . ' ', 'snippet' => $name . $snippet];
+        }
     }
 
     /**

@@ -8,6 +8,7 @@ use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\ArrayElement;
 use Microsoft\PhpParser\Node\Attribute;
 use Microsoft\PhpParser\Node\AttributeGroup;
+use Microsoft\PhpParser\Node\CaseStatementNode;
 use Microsoft\PhpParser\Node\ClassBaseClause;
 use Microsoft\PhpParser\Node\ClassInterfaceClause;
 use Microsoft\PhpParser\Node\ClassMembersNode;
@@ -32,6 +33,7 @@ use Microsoft\PhpParser\Node\Statement\InlineHtml;
 use Microsoft\PhpParser\Node\Statement\InterfaceDeclaration;
 use Microsoft\PhpParser\Node\Statement\TraitDeclaration;
 use Microsoft\PhpParser\Node\TraitUseClause;
+use Microsoft\PhpParser\Token;
 use Phpactor\TextDocument\ByteOffset;
 use Phpactor\WorseReflection\Core\Util\NodeUtil;
 
@@ -168,11 +170,11 @@ class CompletionContext
             return false;
         }
 
-        $nodeBeforeOffset = NodeUtil::firstDescendantNodeBeforeOffset($node->getRoot(), $node->parent->getStartPosition());
-
         if ($node instanceof Variable) {
             return false;
         }
+
+        $nodeBeforeOffset = NodeUtil::firstDescendantNodeBeforeOffset($node->getRoot(), $node->parent->getStartPosition());
 
         if ($nodeBeforeOffset instanceof ClassMembersNode) {
             return true;
@@ -264,12 +266,24 @@ class CompletionContext
 
     public static function methodName(Node $node): bool
     {
-        // TODO better distinguish empty body from empty method parameter list
-        if ($node->__toString() === '{') {
+        // If the body (as the current node) is empty, the parent is MethodDeclaration
+        if ($node instanceof CompoundStatementNode && !$node->openBrace instanceof MissingToken) {
             return false;
         }
 
         return $node->parent instanceof MethodDeclaration;
+    }
+
+    public static function statement(Node $node): bool
+    {
+        return $node instanceof CompoundStatementNode
+            || $node instanceof SourceFileNode
+            || $node instanceof CaseStatementNode
+            || $node->parent instanceof CaseStatementNode
+            || $node->parent instanceof SourceFileNode
+            || $node->parent instanceof CompoundStatementNode
+            || $node->parent?->parent instanceof CaseStatementNode
+            || $node->parent?->parent instanceof CompoundStatementNode;
     }
 
     public static function declaration(Node $node, ByteOffset $offset): bool
