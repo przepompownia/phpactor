@@ -9,6 +9,7 @@ use Microsoft\PhpParser\Node\ClassMembersNode;
 use Microsoft\PhpParser\Node\Expression\ObjectCreationExpression;
 use Microsoft\PhpParser\Node\QualifiedName;
 use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
+use Microsoft\PhpParser\Token;
 use Microsoft\PhpParser\TokenKind;
 
 use Phpactor\WorseReflection\Bridge\TolerantParser\Reflection\TraitImport\TraitImports;
@@ -64,12 +65,22 @@ class ReflectionClass extends AbstractReflectionClass implements CoreReflectionC
     ) {
     }
 
-    public function isAbstract(): bool
+    public function isAnonymous(): bool
     {
-        if ($this->node instanceof ObjectCreationExpression) {
+        if ($this->node instanceof ClassDeclaration) {
             return false;
         }
 
+        return $this->node->classTypeDesignator instanceof Token;
+    }
+
+    public function isAbstract(): bool
+    {
+        if ($this->isAnonymous()) {
+            return false;
+        }
+
+        /** @phpstan-ignore-next-line */
         $modifier = $this->node->abstractOrFinalModifier;
 
         /** @phpstan-ignore-next-line */
@@ -91,10 +102,9 @@ class ReflectionClass extends AbstractReflectionClass implements CoreReflectionC
         $members = ClassLikeReflectionMemberCollection::empty();
         foreach ($this->hierarchy() as $reflectionClassLike) {
             $classLikeMembers = $reflectionClassLike->ownMembers();
-            $classLikeMembers = $classLikeMembers->merge($this->serviceLocator->methodProviders()->provideMembers(
-                $this->serviceLocator,
-                $reflectionClassLike
-            ));
+            $classLikeMembers = $classLikeMembers->merge(
+                $this->serviceLocator->methodProviders()->provideMembers($this->serviceLocator, $reflectionClassLike)
+            );
 
             // only inerit public and protected properties from parent classes
             if ($reflectionClassLike !== $this && !$reflectionClassLike instanceof ReflectionTrait) {
