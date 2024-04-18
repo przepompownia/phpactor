@@ -31,15 +31,17 @@ use Microsoft\PhpParser\Node\StatementNode;
 use Microsoft\PhpParser\Node\Statement\ClassDeclaration;
 use Microsoft\PhpParser\Node\Statement\CompoundStatementNode;
 use Microsoft\PhpParser\Node\Statement\DoStatement;
+use Microsoft\PhpParser\Node\Statement\EchoStatement;
 use Microsoft\PhpParser\Node\Statement\EnumDeclaration;
 use Microsoft\PhpParser\Node\Statement\ForStatement;
+use Microsoft\PhpParser\Node\Statement\ForeachStatement;
 use Microsoft\PhpParser\Node\Statement\IfStatementNode;
 use Microsoft\PhpParser\Node\Statement\InlineHtml;
 use Microsoft\PhpParser\Node\Statement\InterfaceDeclaration;
+use Microsoft\PhpParser\Node\Statement\SwitchStatementNode;
 use Microsoft\PhpParser\Node\Statement\TraitDeclaration;
 use Microsoft\PhpParser\Node\Statement\WhileStatement;
 use Microsoft\PhpParser\Node\TraitUseClause;
-use Microsoft\PhpParser\Token;
 use Phpactor\TextDocument\ByteOffset;
 use Phpactor\WorseReflection\Core\Util\NodeUtil;
 
@@ -280,10 +282,30 @@ class CompletionContext
         return $node->parent instanceof MethodDeclaration;
     }
 
-    public static function statement(Node $node): bool
+    public static function statement(Node $node, ByteOffset $offset): bool
     {
-        if ($node instanceof CompoundStatementNode) {
+        if ($node instanceof CaseStatementNode) {
             return true;
+        }
+
+        if ($node instanceof CompoundStatementNode) {
+            $lastStmt = \end($node->statements);
+            if (false === $lastStmt || $lastStmt->getEndPosition() > $offset->toInt()) {
+                return true;
+            }
+            return !$lastStmt instanceof EchoStatement;
+        }
+
+        if ($node instanceof Expression) {
+            return false;
+        }
+
+        if ($node instanceof SwitchStatementNode) {
+            if ([] === $node->caseStatements) {
+                return false;
+            }
+
+            return $offset->toInt() > $node->caseStatements[0]->getStartPosition();
         }
 
         if (
@@ -292,17 +314,20 @@ class CompletionContext
                 || $node instanceof DoStatement
                 || $node instanceof CatchClause
                 || $node instanceof ForStatement
+                || $node instanceof ForeachStatement
+                || $node instanceof EchoStatement
                 || $node->parent instanceof ExpressionList
                 || $node->parent instanceof WhileStatement
                 || $node->parent instanceof DoStatement
                 || $node->parent instanceof IfStatementNode
                 || $node->parent instanceof CatchClause
+                || $node->parent instanceof ForeachStatement
+                || $node->parent instanceof SwitchStatementNode
         ) {
             return false;
         }
 
         return $node instanceof SourceFileNode
-            || $node instanceof CaseStatementNode
             || $node->parent instanceof CaseStatementNode
             || $node->parent instanceof SourceFileNode
             || $node->parent instanceof CompoundStatementNode

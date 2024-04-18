@@ -73,7 +73,7 @@ class CompletionContextTest extends TestCase
 
         yield 'in class method body 1' => [
             '<?php class Foo { public function foo() { A<> }',
-            true
+            true,
         ];
         yield 'in class method body 2' => [
             '<?php class Foo { public function bar() { if (true) { return false; } A<> } }',
@@ -92,7 +92,7 @@ class CompletionContextTest extends TestCase
     {
         [$source, $offset] = ExtractOffset::fromSource($source);
         $node = (new Parser())->parseSourceFile($source)->getDescendantNodeAtPosition((int)$offset);
-        self::assertEquals($expected, CompletionContext::statement($node));
+        self::assertEquals($expected, CompletionContext::statement($node, ByteOffset::fromInt($offset)));
     }
 
     /**
@@ -149,6 +149,34 @@ class CompletionContextTest extends TestCase
             true,
         ];
 
+        yield 'string literal' => [
+            '<?php class Foo { private function foo() { "<>" }',
+            false,
+        ];
+        yield 'string literal 2' => [
+            '<?php class Foo { private function foo() { "rrr<>" }',
+            false,
+        ];
+        yield 'switch condition' => [
+            '<?php class Foo { private function foo() { switch (<>) {} } }',
+            false,
+        ];
+        yield 'switch condition 2' => [
+            '<?php class Foo { private function foo() { switch (re<>) {} } }',
+            false,
+        ];
+        yield 'foreach condition' => [
+            '<?php class Foo { private function foo() { foreach (<>) {} } }',
+            false,
+        ];
+        yield 'foreach condition 2' => [
+            '<?php class Foo { private function foo() { foreach (re<>) {} } }',
+            false,
+        ];
+        yield 'foreach condition key' => [
+            '<?php class Foo { private function foo() { foreach ($x as re<>) {} } }',
+            false,
+        ];
         yield 'for condition 1' => [
             '<?php class Foo { private function foo() { for (<>) {} } }',
             false,
@@ -225,6 +253,38 @@ class CompletionContextTest extends TestCase
             '<?php class Foo { public function baz(){} #[Foo\<>]public function bar(){}}',
             false,
         ];
+        yield 'after member access 1' => [
+            '<?php class Foo { private function foo() { $this-><> } }',
+            false,
+        ];
+        yield 'after member access 2' => [
+            '<?php class Foo { private function foo() { return $this-><> } }',
+            false,
+        ];
+        yield 'after static access 1' => [
+            '<?php class Foo { private function foo() { return self::<> } }',
+            false,
+        ];
+        yield 'echo 1' => [
+            '<?php class Foo { private function foo() { $t = 1; echo <>; $t = 2; } }',
+            false,
+        ];
+        yield 'echo 2' => [
+            '<?php class Foo { private function foo() { echo <>; $t = 2; } }',
+            false,
+        ];
+        yield 'echo 3' => [
+            '<?php class Foo { private function foo() { echo <>; } }',
+            false,
+        ];
+        yield 'echo 4' => [
+            '<?php class Foo { private function foo() { $t = 1; echo <> } }',
+            false,
+        ];
+        yield 'echo 5' => [
+            '<?php class Foo { private function foo() { echo <> $t = 1;} }',
+            false,
+        ];
     }
 
     /**
@@ -244,15 +304,15 @@ class CompletionContextTest extends TestCase
     {
         yield 'property' => [
             '<?php class Foo { pri<> }',
-            true
+            true,
         ];
         yield 'visibility 1' => [
             '<?php class Foo { <> }',
-            true
+            true,
         ];
         yield 'visibility 2' => [
             '<?php class Foo { private <> }',
-            true
+            true,
         ];
         yield 'visibility 3' => [
             '<?php class Foo { private Foob<> }',
