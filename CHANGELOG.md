@@ -5,6 +5,7 @@ Changelog
 
 Bug fixes:
 
+  - Docblock: support parsing quoted string literals as array valuyes #2730
   - Tell WorseReflection about new definitions from the stdin for the
     diagnostics process #2723
   - Flush index on save (make latest changes available to diagnostic process) #2722
@@ -24,6 +25,7 @@ Improvements:
 
 Features:
 
+  - Add support for 8.3 typed class constants
   - Basic support for `@{phpstan,psalm}-assert` #2720 @dantleech
 
 ## 2024-06-30
