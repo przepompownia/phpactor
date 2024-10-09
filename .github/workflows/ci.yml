@@ -131,9 +131,10 @@ jobs:
                     -dzend.assertions=1 \
                     vendor/bin/phpunit --log-junit phpunit-junit.xml
             -
+                if: "contains(github.ref, 'master')"
                 name: "Upload to Historian"
                 run: |
-                  curl http://${{ secrets.HISTORIAN_HOST }}/api/upload -XPOST \
+                  curl https://${{ secrets.HISTORIAN_HOST }}/api/upload -XPOST \
                     -H"X-Api-Key: ${{ secrets.HISTORIAN_API_KEY }}" \
                     -H"X-Build: ${{ github.run_number }}" \
                     -H"X-Commit-Sh: ${{ github.sha }}" \
@@ -268,9 +269,10 @@ jobs:
                 name: "Run PHPBench"
                 run: "vendor/bin/phpbench run --progress=plain --iterations=1 --dump-file=phpbench.xml"
             -
+                if: "contains(github.ref, 'master')"
                 name: "Upload to Historian"
                 run: |
-                  curl http://${{ secrets.HISTORIAN_HOST }}/api/upload -XPOST \
+                  curl https://${{ secrets.HISTORIAN_HOST }}/api/upload -XPOST \
                     -H"X-Api-Key: ${{ secrets.HISTORIAN_API_KEY }}" \
                     -H"X-Build: ${{ github.run_number }}" \
                     -H"X-Commit-Sh: ${{ github.sha }}" \
