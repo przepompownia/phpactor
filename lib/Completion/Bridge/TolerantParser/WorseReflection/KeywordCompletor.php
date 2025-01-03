@@ -33,6 +33,7 @@ class KeywordCompletor implements TolerantCompletor
         '__unset' => "(string \\\$\${1:name}): void\n{\$0\n}",
         '__wakeup' => "(): void\n{\$0\n}",
     ];
+
     private const STATEMENTS = [
         'break' => '$1;$0',
         'continue' => '$1;$0',
@@ -52,7 +53,7 @@ class KeywordCompletor implements TolerantCompletor
     public function complete(Node $node, TextDocument $source, ByteOffset $offset): Generator
     {
         if (CompletionContext::promotedPropertyVisibility($node)) {
-            yield from $this->keywords(['private ', 'public ', 'protected ', ]);
+            yield from $this->keywords(['private ', 'public ', 'protected ']);
             return true;
         }
         if (CompletionContext::classClause($node, $offset)) {
