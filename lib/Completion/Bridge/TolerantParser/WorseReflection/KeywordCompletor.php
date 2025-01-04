@@ -6,6 +6,7 @@ namespace Phpactor\Completion\Bridge\TolerantParser\WorseReflection;
 
 use Generator;
 use Microsoft\PhpParser\Node;
+use Microsoft\PhpParser\Node\StatementNode;
 use Phpactor\Completion\Bridge\TolerantParser\CompletionContext;
 use Phpactor\Completion\Bridge\TolerantParser\TolerantCompletor;
 use Phpactor\Completion\Core\Suggestion;
@@ -84,10 +85,12 @@ class KeywordCompletor implements TolerantCompletor
 
         if (CompletionContext::expression($node)) {
             yield from $this->matchExpr();
+            return true;
         }
 
         if (
             CompletionContext::classMembersBody($node->parent)
+                && !$node->parent instanceof StatementNode
         ) {
             yield from $this->keywords([
                 'function ',
@@ -104,6 +107,9 @@ class KeywordCompletor implements TolerantCompletor
         return true;
     }
 
+    /**
+     * @return Generator<Suggestion>
+     */
     private function matchExpr(): Generator
     {
         foreach (self::EXPRESSIONS as $name => $snippet) {
