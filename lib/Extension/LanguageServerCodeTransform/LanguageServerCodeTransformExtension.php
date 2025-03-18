@@ -269,7 +269,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 $container->get(ReplaceQualifierWithImport::class)
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [],
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [ 'priority' => 100],
         ]);
 
         $container->register(ImportNameProvider::class, function (Container $container) {
@@ -278,7 +278,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 $container->getParameter(self::PARAM_REPORT_NON_EXISTING_NAMES)
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [],
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [ 'priority' => 100],
         ]);
         $container->register(OverridableMethodFinder::class, function (Container $container) {
             return new OverridableMethodFinder(
@@ -290,7 +290,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 $container->get(OverridableMethodFinder::class),
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [],
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => ['priority' => -200],
         ]);
 
         $container->register(TransformerCodeActionPovider::class.'promote_constructor_private', function (Container $container) {
@@ -310,7 +310,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 'Promote Constructor (public)'
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => []
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [ 'priority' => 100]
         ]);
 
         $container->register(TransformerCodeActionPovider::class.'complete_constructor_private', function (Container $container) {
@@ -320,7 +320,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 'Complete Constructor (private)'
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => []
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [ 'priority' => 100]
         ]);
 
         $container->register(TransformerCodeActionPovider::class.'complete_constructor_public', function (Container $container) {
@@ -330,7 +330,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 'Complete Constructor (public)'
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => []
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [ 'priority' => 100]
         ]);
         $container->register(TransformerCodeActionPovider::class.'add_missing_class_generic', function (Container $container) {
             return new TransformerCodeActionPovider(
@@ -437,7 +437,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 'Remove unused imports'
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => []
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [ 'priority' => 100]
         ]);
 
         $container->register(GenerateMemberProvider::class, function (Container $container) {
@@ -501,7 +501,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 'fill new object construct with named parameters',
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => []
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [ 'priority' => 100]
         ]);
         $container->register(ByteOffsetRefactorProvider::class.'.fill_match_arms', function (Container $container) {
             return new ByteOffsetRefactorProvider(
@@ -521,7 +521,7 @@ class LanguageServerCodeTransformExtension implements Extension
                 'replace string with HereDoc',
             );
         }, [
-            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => []
+            LanguageServerExtension::TAG_CODE_ACTION_PROVIDER => [ 'priority' => 100]
         ]);
 
         $container->register(GenerateConstructorProvider::class, function (Container $container) {
