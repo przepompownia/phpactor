@@ -89,6 +89,8 @@ class CompletionContext
             $node instanceof CallExpression
             || $parent instanceof ArgumentExpression
         ) {
+
+        if ($parent instanceof ArgumentExpression) {
             return true;
         }
 
