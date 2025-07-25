@@ -1800,22 +1800,6 @@ File extensions (e.g. `php`) for files that should be indexed
 **Default**: ``["php","phar"]``
 
 
-.. _param_indexer.searcher_semi_fuzzy:
-
-
-``indexer.searcher_semi_fuzzy``
-"""""""""""""""""""""""""""""""
-
-
-Type: boolean
-
-
-How to match short names: by default only the leading part is matched (case insensitive). If true, the leading parts of subsequent subwords also match (camel/underscore, case sensitive). For example `InEx` and `index` match `IndexerExtension` but `inex` does not, `arw` matches `array_walk`.
-
-
-**Default**: ``false``
-
-
 .. _param_indexer.search_include_patterns:
 
 
@@ -1830,6 +1814,21 @@ When searching the index exclude records whose fully qualified names match any o
 
 
 **Default**: ``[]``
+
+.. _param_indexer.searcher_semi_fuzzy:
+
+
+``indexer.searcher_semi_fuzzy``
+"""""""""""""""""""""""""""""""
+
+
+Type: boolean
+
+
+How to match short names: by default only the leading part is matched (case insensitive). If true, the leading parts of subsequent subwords also match (camel/underscore, case sensitive). For example `InEx` and `index` match `IndexerExtension` but `inex` does not, `arw` matches `array_walk`.
+
+
+**Default**: ``false``
 
 
 .. _ObjectRendererExtension:
