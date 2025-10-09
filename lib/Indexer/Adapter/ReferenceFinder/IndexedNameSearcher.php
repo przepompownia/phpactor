@@ -31,15 +31,12 @@ class IndexedNameSearcher implements NameSearcher
         }
 
         $fullyQualified = str_starts_with($name, '\\');
-        if ($fullyQualified) {
-            $criteria = Criteria::fqnBeginsWith(substr($name, 1));
-        } else {
-            $criteria = Criteria::shortNameMatchesTo($name, $this->semiFuzzy);
-        }
+
+        $criteria = $fullyQualified ? Criteria::fqnBeginsWith(substr($name, 1)) : Criteria::shortNameMatchesTo($name, $this->semiFuzzy);
 
         $typeCriteria = $this->resolveTypeCriteria($type);
 
-        if ($typeCriteria) {
+        if (null !== $typeCriteria) {
             $criteria = Criteria::and(
                 $criteria,
                 Criteria::or(
@@ -66,7 +63,6 @@ class IndexedNameSearcher implements NameSearcher
     private function resolveTypeCriteria(?string $type): ?Criteria
     {
         return match($type) {
-            // todo before merge check if this condition occurs anywhere and possibly remove it
             NameSearcherType::ATTRIBUTE => Criteria::isAttribute(),
             NameSearcherType::ATTRIBUTE_TARGET_CLASS => Criteria::isClassAttribute(),
             NameSearcherType::ATTRIBUTE_TARGET_CLASS_CONSTANT => Criteria::isClassConstantAttribute(),
