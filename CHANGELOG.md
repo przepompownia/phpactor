@@ -20,6 +20,8 @@ Improvements:
   - Improved inlay type hints #2825 @dantleech
   - Improve static analysis performance in some cases #2929 @dantleech
   - Support for asymmetrical visiblity in parser #2926 @dantleech
+  - Ignore rector-stubs by default (frequently causes PHPUnit testcase
+    reflection issues) #2944 @dantleech
 
 Security:
 
@@ -28,6 +30,7 @@ Security:
 Bug fixes:
 
   - rename: Do not throw error if there is a reference to a now-non-existing file. @dantleech
+  - avoid infinite loop when looking up constant type #2913 @dantleech
 
 ## 2025-07-25.0
 
