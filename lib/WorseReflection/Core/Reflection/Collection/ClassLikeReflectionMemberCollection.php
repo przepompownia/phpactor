@@ -7,7 +7,6 @@ use Microsoft\PhpParser\Node;
 use Microsoft\PhpParser\Node\ClassConstDeclaration;
 use Microsoft\PhpParser\Node\ClassMembersNode;
 use Microsoft\PhpParser\Node\EnumCaseDeclaration;
-use Microsoft\PhpParser\Node\Expression\AssignmentExpression;
 use Microsoft\PhpParser\Node\Expression\ObjectCreationExpression;
 use Microsoft\PhpParser\Node\Expression\Variable;
 use Microsoft\PhpParser\Node\MethodDeclaration;
@@ -294,12 +293,14 @@ final class ClassLikeReflectionMemberCollection extends AbstractReflectionCollec
                     if (!$children) {
                         continue;
                     }
-                    foreach (array_filter($children, function ($member) {
-                        if (!$member instanceof Parameter) {
-                            return false;
-                        }
-                        return $member->visibilityToken !== null;
-                    }) as $promotedParameter) {
+                    foreach (
+                        array_filter($children, function ($member) {
+                            if (!$member instanceof Parameter) {
+                                return false;
+                            }
+                            return $member->visibilityToken !== null;
+                        }) as $promotedParameter
+                    ) {
                         if (!$promotedParameter instanceof Parameter) {
                             continue;
                         }
