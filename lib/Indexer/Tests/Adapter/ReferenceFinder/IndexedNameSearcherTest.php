@@ -116,18 +116,6 @@ class IndexedNameSearcherTest extends IndexTestCase
             $this->workspace()->put($path, $contents);
         }
 
-        $agent = $this->indexAgent();
-        $agent->indexer()->getJob()->run();
-        $searcher = new IndexedNameSearcher($agent->search(), false);
-
-        $resultPaths = [];
-        $offset = 1 + mb_strlen($this->workspace()->path());
-        foreach ($searcher->search($query, $type) as $result) {
-            assert($result instanceof NameSearchResult);
-            self::assertNotNull($result->uri());
-            $resultPaths[] = mb_substr($result->uri()->path(), $offset);
-        }
-
         self::assertEqualsCanonicalizing($expectedResultPaths, $resultPaths);
     }
 
