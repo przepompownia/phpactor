@@ -72,6 +72,7 @@ class IndexerExtension implements Extension
     public const PARAM_PARALLEL_WORKERS = 'indexer.parallel_workers';
     public const PARAM_PARALLEL_MIN_FILES = 'indexer.parallel_min_files';
     public const PARAM_WORKER_BIN = 'indexer.worker_bin';
+    public const PARAM_SEARCHER_SEMI_FUZZY = 'indexer.searcher_semi_fuzzy';
     public const TAG_WATCHER = 'indexer.watcher';
     private const SERVICE_INDEXER_EXCLUDE_PATTERNS = 'indexer.exclude_patterns';
     private const SERVICE_INDEXER_INCLUDE_PATTERNS = 'indexer.include_patterns';
@@ -109,6 +110,7 @@ class IndexerExtension implements Extension
             self::PARAM_PARALLEL_WORKERS => 0,
             self::PARAM_PARALLEL_MIN_FILES => 500,
             self::PARAM_WORKER_BIN => '%application_root%/bin/phpactor',
+            self::PARAM_SEARCHER_SEMI_FUZZY => false,
         ]);
         $schema->setDescriptions([
             self::PARAM_ENABLED_WATCHERS => 'List of allowed watchers. The first watcher that supports the current system will be used',
@@ -128,6 +130,7 @@ class IndexerExtension implements Extension
             self::PARAM_PARALLEL_MIN_FILES => 'Only index in parallel when at least this many files need indexing - starting a pool of workers does not pay for itself on a handful of changed files',
             self::PARAM_WORKER_BIN => 'Internal use only - path to the Phpactor binary used to spawn index workers',
             self::PARAM_SEARCH_INCLUDE_PATTERNS => 'When searching the index exclude records whose fully qualified names match any of these regex patterns (use to exclude suggestions from search results). Namespace separators must be escaped as `\\\\\\\\` for example `^Foo\\\\\\\\` to include all namespaces whose first segment is `Foo`',
+            self::PARAM_SEARCHER_SEMI_FUZZY => 'How to match short names: by default only the leading part is matched (case insensitive). If true, the leading parts of subsequent subwords also match (camel/underscore, case sensitive). For example `InEx` and `index` match `IndexerExtension` but `inex` does not, `arw` matches `array_walk`.',
         ]);
         $schema->setTypes([
             self::PARAM_ENABLED_WATCHERS => 'array',
@@ -147,6 +150,7 @@ class IndexerExtension implements Extension
             self::PARAM_PARALLEL_WORKERS => 'integer',
             self::PARAM_PARALLEL_MIN_FILES => 'integer',
             self::PARAM_WORKER_BIN => 'string',
+            self::PARAM_SEARCHER_SEMI_FUZZY => 'boolean',
         ]);
     }
 
@@ -333,7 +337,8 @@ class IndexerExtension implements Extension
 
         $container->register(IndexedNameSearcher::class, function (Container $container) {
             return new IndexedNameSearcher(
-                $container->get(SearchClient::class)
+                $container->get(SearchClient::class),
+                $container->parameter(self::PARAM_SEARCHER_SEMI_FUZZY)->bool(),
             );
         }, [ ReferenceFinderExtension::TAG_NAME_SEARCHER => []]);
     }
