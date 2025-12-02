@@ -109,7 +109,7 @@ class CompletionContextTest extends TestCase
     public function testStatement(string $source, bool $expected): void
     {
         [$source, $offset] = ExtractOffset::fromSource($source);
-        $node = (new TolerantAstProvider())->get(TextDocumentBuilder::fromString($source))->getDescendantNodeAtPosition((int)$offset);
+        $node = (new TolerantAstProvider())->get(TextDocumentBuilder::fromString($source))->getDescendantNodeAtPosition($offset);
         self::assertEquals($expected, CompletionContext::statement($node, ByteOffset::fromInt($offset)));
     }
 
