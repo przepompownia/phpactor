@@ -325,7 +325,7 @@ class CompletionContextTest extends TestCase
     public function testClassMemberBody(string $source, bool $expected): void
     {
         [$source, $offset] = ExtractOffset::fromSource($source);
-        $node = (new TolerantAstProvider())->get(TextDocumentBuilder::fromString($source))->getDescendantNodeAtPosition((int)$offset);
+        $node = (new TolerantAstProvider())->get(TextDocumentBuilder::fromString($source))->getDescendantNodeAtPosition($offset);
         self::assertEquals($expected, CompletionContext::classMembersBody($node));
     }
 
