@@ -3,6 +3,7 @@
 namespace Phpactor\Completion\Tests\Unit\Bridge\TolerantParser;
 
 use Phpactor\CodeBuilder\Domain\Code;
+O
 use Phpactor\WorseReflection\Bridge\TolerantParser\AstProvider\TolerantAstProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Generator;
