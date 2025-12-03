@@ -69,13 +69,29 @@ class CompletionContextTest extends TestCase
             "<?php class Foo { public function bar() {\necho 'hello world'; \$bar = 12;} A<> }",
             false,
         ];
+        yield 'not between if keyword and body' => [
+            '<?php if(1)<> {}',
+            false,
+        ];
+        yield 'not in variable' => [
+            '<?php $<>',
+            false,
+        ];
+        yield 'not in scoped property access expr' => [
+            '<?php class Foo { public function foo() { $this->foo(self::<>) }',
+            false,
+        ];
 
         yield 'in class method body 1' => [
             '<?php class Foo { public function foo() { A<> }',
-            true
+            true,
         ];
         yield 'in class method body 2' => [
             '<?php class Foo { public function bar() { if (true) { return false; } A<> } }',
+            true,
+        ];
+        yield 'in function call' => [
+            '<?php class Foo { public function foo() { $this->foo(<>) }',
             true,
         ];
         yield 'in foreach' => [
@@ -111,6 +127,10 @@ class CompletionContextTest extends TestCase
         ];
         yield 'visibility 3' => [
             '<?php class Foo { private Foob<> }',
+            true,
+        ];
+        yield 'method body' => [
+            '<?php class Foo { private function foo() { <> } }',
             true,
         ];
 
