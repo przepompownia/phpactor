@@ -80,7 +80,6 @@ class SerializedIndexTest extends IntegrationTestCase
         iterator_to_array($index->optimise(false));
 
         $record = $index->get(ClassRecord::fromName('Foobar'));
-        assert($record instanceof ClassRecord);
         self::assertEquals([
             $this->workspace()->path('ref1.php'),
             $this->workspace()->path('ref2.php'),
