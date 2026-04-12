@@ -14,8 +14,10 @@ use SplFileInfo;
 
 class SerializedIndex implements Index
 {
-    public function __construct(private FileRepository $repository, private TextDocumentLocator $locator)
-    {
+    public function __construct(
+        private FileRepository $repository,
+        private TextDocumentLocator $locator
+    ) {
     }
 
     public function lastUpdate(): int
@@ -68,7 +70,8 @@ class SerializedIndex implements Index
                 }
                 if ($removed > 0) {
                     $this->write($record);
-                    yield sprintf('removed %d dead refernces from %s:%s',
+                    yield sprintf(
+                        'removed %d dead refernces from %s:%s',
                         $removed,
                         $record->recordType(),
                         $record->identifier(),

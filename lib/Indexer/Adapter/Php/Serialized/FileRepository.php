@@ -148,6 +148,47 @@ class FileRepository
         }
         $this->buffer = [];
     }
+    /**
+     * @return Generator<string,Record>
+     */
+    public function iterator(): Generator
+    {
+        $flags =
+            FilesystemIterator::KEY_AS_PATHNAME |
+            FilesystemIterator::CURRENT_AS_FILEINFO |
+            FilesystemIterator::SKIP_DOTS;
+
+        $files = new RecursiveDirectoryIterator($this->path, $flags);
+        $files = new RecursiveIteratorIterator(
+            $files,
+            RecursiveIteratorIterator::LEAVES_ONLY,
+            RecursiveIteratorIterator::CATCH_GET_CHILD
+        );
+
+        foreach ($files as $file) {
+            assert($file instanceof SplFileInfo);
+
+            if ($file->getExtension() !== 'cache') {
+                continue;
+            }
+
+            $contents = file_get_contents($file->getPathname());
+
+            if (false === $contents) {
+                continue;
+            }
+
+            $record = $this->serializer->deserialize(
+                $contents
+            );
+
+            if (null === $record) {
+                continue;
+            }
+
+            yield $file->getPathname() => $record;
+        }
+    }
 
     private function ensureDirectoryExists(string $path): void
     {
@@ -187,46 +228,5 @@ class FileRepository
     private function bufferKey(Record $record): string
     {
         return $record->recordType().$record->identifier();
-    }
-    /**
-     * @return Generator<string,Record>
-     */
-    public function iterator(): \Generator
-    {
-        $flags =
-            FilesystemIterator::KEY_AS_PATHNAME |
-            FilesystemIterator::CURRENT_AS_FILEINFO |
-            FilesystemIterator::SKIP_DOTS;
-
-        $files = new RecursiveDirectoryIterator($this->path, $flags);
-        $files = new RecursiveIteratorIterator(
-            $files,
-            RecursiveIteratorIterator::LEAVES_ONLY,
-            RecursiveIteratorIterator::CATCH_GET_CHILD
-        );
-
-        foreach ($files as $file) {
-            assert($file instanceof SplFileInfo);
-
-            if ($file->getExtension() !== 'cache') {
-                continue;
-            }
-
-            $contents = file_get_contents($file->getPathname());
-
-            if (false === $contents) {
-                continue;
-            }
-
-            $record = $this->serializer->deserialize(
-                $contents
-            );
-
-            if (null === $record) {
-                continue;
-            }
-
-            yield $file->getPathname() => $record;
-        }
     }
 }

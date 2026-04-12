@@ -15,13 +15,10 @@ class IndexOptimiseCommand extends Command
 {
     private const OPT_DRY_RUN = 'dry-run';
 
-    private MemoryUsage $usage;
-
     public function __construct(
         private Indexer $indexer,
     ) {
         parent::__construct();
-        $this->usage = MemoryUsage::create();
     }
 
     protected function configure(): void

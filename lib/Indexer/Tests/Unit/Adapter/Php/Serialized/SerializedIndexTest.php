@@ -95,8 +95,8 @@ class SerializedIndexTest extends IntegrationTestCase
     private function createIndex(FileRepository $repo): SerializedIndex
     {
         return new SerializedIndex(
-                    $repo,
-                    new FilesystemTextDocumentLocator(),
-                );
+            $repo,
+            new FilesystemTextDocumentLocator(),
+        );
     }
 }
