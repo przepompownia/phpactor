@@ -34,6 +34,7 @@ use Phpactor\Indexer\Model\SearchIndex\FilteredSearchIndex;
 use Phpactor\Indexer\Model\SearchIndex\SearchIncludeIndex;
 use Phpactor\Indexer\Model\SearchIndex\ValidatingSearchIndex;
 use Phpactor\Indexer\Model\TestIndexAgent;
+use Phpactor\TextDocument\FilesystemTextDocumentLocator;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -218,7 +219,12 @@ final class IndexAgentBuilder
             $this->logger
         );
 
-        return new SerializedIndex($repository);
+        return new SerializedIndex(
+            $repository,
+            // TODO: inject this as it should probably use the chain locator that includes
+            // the workspace locator
+            new FilesystemTextDocumentLocator()
+        );
     }
 
     private function buildQuery(Index $index): QueryClient

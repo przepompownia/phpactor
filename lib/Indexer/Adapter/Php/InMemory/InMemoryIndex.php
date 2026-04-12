@@ -2,6 +2,7 @@
 
 namespace Phpactor\Indexer\Adapter\Php\InMemory;
 
+use Generator;
 use Phpactor\Indexer\Model\Index;
 use Phpactor\Indexer\Model\Record;
 use SplFileInfo;
@@ -75,5 +76,10 @@ class InMemoryIndex implements Index
     private function recordKey(Record $record): string
     {
         return $record->recordType().$record->identifier();
+    }
+
+    public function optimise(bool $dryRun): iterable
+    {
+        return [];
     }
 }

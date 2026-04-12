@@ -16,6 +16,18 @@ class FileRepositoryTest extends IntegrationTestCase
 {
     use ProphecyTrait;
 
+    public function testIterate(): void
+    {
+        $repo = $this->createFileRepository();
+        $repo->put(ClassRecord::fromName('Foobar'));
+        $repo->put(ClassRecord::fromName('Barfoo'));
+        $repo->flush();
+
+        $records = iterator_to_array($repo->iterator());
+        self::assertCount(2, $records);
+        self::assertEquals('class', $records[0]->recordType());
+    }
+
     public function testResetRemovesTheIndex(): void
     {
         $repo = $this->createFileRepository();
