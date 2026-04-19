@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1776123117937,
+  "lastUpdate": 1776600187016,
   "repoUrl": "https://github.com/przepompownia/phpactor",
   "entries": {
     "Phpactor Benchmarks": [
@@ -1246,6 +1246,422 @@ window.BENCHMARK_DATA = {
             "name": "BaseLineBench::benchRpcEcho",
             "value": 99379.04696673201,
             "range": "± 0.37%",
+            "unit": "μs",
+            "extra": "4 iterations, 2 revs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "przepompownia@users.noreply.github.com",
+            "name": "Tomasz N",
+            "username": "przepompownia"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6a46d386795040bc7974b1995108336488d90fd2",
+          "message": "Allow goto definition from first class callables (#3025)",
+          "timestamp": "2026-04-18T12:47:07+01:00",
+          "tree_id": "1d0f352ee7dd446f234eae329724fa9decd4a15b",
+          "url": "https://github.com/przepompownia/phpactor/commit/6a46d386795040bc7974b1995108336488d90fd2"
+        },
+        "date": 1776600186368,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ClassMemberCompletorBench::benchComplete (short)",
+            "value": 10.008561643835424,
+            "range": "± 1.47%",
+            "unit": "ms",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "ClassMemberCompletorBench::benchComplete (long)",
+            "value": 154.3497358121326,
+            "range": "± 0.85%",
+            "unit": "ms",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "WorseLocalVariableCompletorBench::benchComplete (short)",
+            "value": 2.3182583170254465,
+            "range": "± 1.41%",
+            "unit": "ms",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "WorseLocalVariableCompletorBench::benchComplete (long)",
+            "value": 22.02498630136996,
+            "range": "± 0.78%",
+            "unit": "ms",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "ConfigLoaderBench::benchJsonLoadConfig",
+            "value": 30.60829745596886,
+            "range": "± 1.65%",
+            "unit": "μs",
+            "extra": "30 iterations, 50 revs"
+          },
+          {
+            "name": "ConfigLoaderBench::benchJsonLoadConfigWithBuilder",
+            "value": 32.47874755381586,
+            "range": "± 1.30%",
+            "unit": "μs",
+            "extra": "30 iterations, 50 revs"
+          },
+          {
+            "name": "ConfigLoaderBench::benchJsonLoadConfigWithNonExistingYaml",
+            "value": 54.904109589041276,
+            "range": "± 1.07%",
+            "unit": "μs",
+            "extra": "30 iterations, 50 revs"
+          },
+          {
+            "name": "ConfigLoaderBench::benchJsonPlainPhp",
+            "value": 18.316281800391355,
+            "range": "± 1.03%",
+            "unit": "μs",
+            "extra": "30 iterations, 50 revs"
+          },
+          {
+            "name": "ConfigLoaderBench::benchYamlLoadConfig",
+            "value": 86.0402348336599,
+            "range": "± 1.04%",
+            "unit": "μs",
+            "extra": "30 iterations, 50 revs"
+          },
+          {
+            "name": "PhpactorParserBench::benchParse",
+            "value": 54.40673189823874,
+            "range": "± 3.16%",
+            "unit": "μs",
+            "extra": "33 iterations, 50 revs"
+          },
+          {
+            "name": "PhpactorParserBench::benchAssert",
+            "value": 17284.074363992106,
+            "range": "± 2.81%",
+            "unit": "μs",
+            "extra": "10 iterations, 5 revs"
+          },
+          {
+            "name": "LexerBench::benchLex",
+            "value": 577,
+            "range": "± 0.00%",
+            "unit": "μs",
+            "extra": "1 iterations, 1 revs"
+          },
+          {
+            "name": "LexerBench::benchLex (1)",
+            "value": 1394,
+            "range": "± 0.00%",
+            "unit": "μs",
+            "extra": "1 iterations, 1 revs"
+          },
+          {
+            "name": "ImportNameProviderBench::benchDiagnostics",
+            "value": 11857.849315068499,
+            "range": "± 2.90%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "ImportNameProviderBench::benchCodeActions",
+            "value": 12014.976516634117,
+            "range": "± 0.86%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "WorkspaceIndexBench::benchUpdate (length: 1)",
+            "value": 0.07420254403131131,
+            "range": "± 4.30%",
+            "unit": "ms",
+            "extra": "10 iterations, 10 revs"
+          },
+          {
+            "name": "WorkspaceIndexBench::benchUpdate (length: 1001)",
+            "value": 0.07637221135029104,
+            "range": "± 2.11%",
+            "unit": "ms",
+            "extra": "10 iterations, 10 revs"
+          },
+          {
+            "name": "WorkspaceIndexBench::benchUpdate (length: 2001)",
+            "value": 0.07540547945205535,
+            "range": "± 3.11%",
+            "unit": "ms",
+            "extra": "10 iterations, 10 revs"
+          },
+          {
+            "name": "WorkspaceIndexBench::benchUpdate (length: 3001)",
+            "value": 0.0752025440313103,
+            "range": "± 3.89%",
+            "unit": "ms",
+            "extra": "10 iterations, 10 revs"
+          },
+          {
+            "name": "WorkspaceIndexBench::benchUpdate (length: 4001)",
+            "value": 0.07466536203522477,
+            "range": "± 4.96%",
+            "unit": "ms",
+            "extra": "10 iterations, 10 revs"
+          },
+          {
+            "name": "WorkspaceIndexBench::benchUpdate (length: 5001)",
+            "value": 0.0739996086105675,
+            "range": "± 3.26%",
+            "unit": "ms",
+            "extra": "10 iterations, 10 revs"
+          },
+          {
+            "name": "WorkspaceIndexBench::benchUpdate (length: 6001)",
+            "value": 0.07384090019569395,
+            "range": "± 2.61%",
+            "unit": "ms",
+            "extra": "10 iterations, 10 revs"
+          },
+          {
+            "name": "TokenExpanderBench::benchExpandTokenizedString",
+            "value": 1.566146575342469,
+            "range": "± 0.95%",
+            "unit": "μs",
+            "extra": "33 iterations, 10000 revs"
+          },
+          {
+            "name": "TokenExpanderBench::benchExpandStringWithNoTokens",
+            "value": 0.05906986301369868,
+            "range": "± 5.06%",
+            "unit": "μs",
+            "extra": "33 iterations, 10000 revs"
+          },
+          {
+            "name": "SearchBench::benchBareFileSearch (A)",
+            "value": 0.13879060665362022,
+            "range": "± 10.12%",
+            "unit": "ms",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "SearchBench::benchBareFileSearch (Request)",
+            "value": 0.13795107632093925,
+            "range": "± 5.72%",
+            "unit": "ms",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "SearchBench::benchFullFileSearch (A)",
+            "value": 0.1346673189823874,
+            "range": "± 11.02%",
+            "unit": "ms",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "SearchBench::benchFullFileSearch (Request)",
+            "value": 0.13353620352250484,
+            "range": "± 1.08%",
+            "unit": "ms",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "IndexedReferenceFinderBench::benchBareFileSearch",
+            "value": 1087833,
+            "range": "± 0.00%",
+            "unit": "μs",
+            "extra": "1 iterations, 1 revs"
+          },
+          {
+            "name": "ClassRecordShortNameBench::benchShortName",
+            "value": 0.09280039138943233,
+            "range": "± 7.96%",
+            "unit": "μs",
+            "extra": "33 iterations, 1000 revs"
+          },
+          {
+            "name": "EfficientLineColsBench::benchLineCols",
+            "value": 288,
+            "range": "± 0.00%",
+            "unit": "μs",
+            "extra": "1 iterations, 1 revs"
+          },
+          {
+            "name": "EfficientLineColsBench::benchLineColsUtf16Positions",
+            "value": 294,
+            "range": "± 0.00%",
+            "unit": "μs",
+            "extra": "1 iterations, 1 revs"
+          },
+          {
+            "name": "EfficientLineColsBench::benchIneffificentLineCols",
+            "value": 293,
+            "range": "± 0.00%",
+            "unit": "μs",
+            "extra": "1 iterations, 1 revs"
+          },
+          {
+            "name": "YiiBench::benchMembers",
+            "value": 294125.362035225,
+            "range": "± 128.45%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "ReflectPropertyBench::property",
+            "value": 1524.0136986301404,
+            "range": "± 3.02%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "ReflectPropertyBench::property_return_type",
+            "value": 2937.4422700587033,
+            "range": "± 1.72%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "PhpUnitReflectClassBench::test_case",
+            "value": 15219.260273972734,
+            "range": "± 0.77%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "PhpUnitReflectClassBench::test_case_methods_and_properties",
+            "value": 136846.83757338556,
+            "range": "± 0.29%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "PhpUnitReflectClassBench::test_case_method_frames",
+            "value": 130732.30136986288,
+            "range": "± 0.63%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "CarbonReflectBench::benchCarbonReflection",
+            "value": 71556.21917808073,
+            "range": "± 0.37%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "AnalyserBench::benchAnalyse",
+            "value": 109276,
+            "range": "± 0.00%",
+            "unit": "μs",
+            "extra": "1 iterations, 1 revs"
+          },
+          {
+            "name": "ReflectMethodBench::method",
+            "value": 1632.365949119377,
+            "range": "± 1.83%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "ReflectMethodBench::method_return_type",
+            "value": 2984.6438356164344,
+            "range": "± 4.42%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "ReflectMethodBench::method_inferred_return_type",
+            "value": 2089.0998043052923,
+            "range": "± 1.24%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "ReflectionStubsBench::test_classes_and_methods",
+            "value": 5635,
+            "range": "± 0.00%",
+            "unit": "μs",
+            "extra": "1 iterations, 1 revs"
+          },
+          {
+            "name": "DiagnosticsBench::benchDiagnostics (lots_of_missing_methods.test)",
+            "value": 60993.33855185914,
+            "range": "± 0.55%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "DiagnosticsBench::benchDiagnostics (lots_of_new_generic_objects.test)",
+            "value": 26341.09589041068,
+            "range": "± 0.52%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "DiagnosticsBench::benchDiagnostics (lots_of_new_objects.test)",
+            "value": 23164.634050879933,
+            "range": "± 1.06%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "DiagnosticsBench::benchDiagnostics (method_chain.test)",
+            "value": 29393.935420743597,
+            "range": "± 0.67%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "DiagnosticsBench::benchDiagnostics (phpstan.test)",
+            "value": 738265.1369863008,
+            "range": "± 0.70%",
+            "unit": "μs",
+            "extra": "5 iterations, 1 revs"
+          },
+          {
+            "name": "SelfReflectClassBench::benchMethodsAndProperties",
+            "value": 938.0698630137092,
+            "range": "± 0.71%",
+            "unit": "μs",
+            "extra": "5 iterations, 10 revs"
+          },
+          {
+            "name": "SelfReflectClassBench::benchFrames",
+            "value": 1348.2050880626275,
+            "range": "± 1.21%",
+            "unit": "μs",
+            "extra": "5 iterations, 10 revs"
+          },
+          {
+            "name": "CompleteBench::benchComplete",
+            "value": 165756,
+            "range": "± 201.28%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "ClassSearchBench::benchClassSearch",
+            "value": 117727.5146771039,
+            "range": "± 1.22%",
+            "unit": "μs",
+            "extra": "10 iterations, 1 revs"
+          },
+          {
+            "name": "BaseLineBench::benchVersion",
+            "value": 97150.95596868842,
+            "range": "± 1.41%",
+            "unit": "μs",
+            "extra": "4 iterations, 2 revs"
+          },
+          {
+            "name": "BaseLineBench::benchRpcEcho",
+            "value": 103256.79256360143,
+            "range": "± 0.32%",
             "unit": "μs",
             "extra": "4 iterations, 2 revs"
           }
