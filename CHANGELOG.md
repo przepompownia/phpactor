@@ -1,14 +1,21 @@
 Changelog
 =========
 
-## master
+## 2026.06.23.0
 
-- Show the Phpactor version in the LSP `phpactor/status` response.
+Improvements:
+
+- Show the Phpactor version in the LSP `phpactor/status` response @dantleech
+- `worse:analyse` writes its progress to STDERR, and its `--format=json` output
+  now reports the line, column, diagnostic code and a readable severity #3061
+  @ajenbo
+
+Bug fixes:
+
+- Fix false positives in analyser ]#3063 @ajenbo
 - Fix functions declared in the source code passed to the reflector being
   reported as not found (e.g. every function declared and called in the same
-  file when running `worse:analyse`).
-- `worse:analyse` writes its progress to STDERR, and its `--format=json` output
-  now reports the line, column, diagnostic code and a readable severity.
+  file when running `worse:analyse`) #3061 @ajenbo.
 
 
 ## 2026.06.22.0
