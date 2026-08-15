@@ -84,6 +84,13 @@ class NodeTest extends NodeTestCase
         ];
 
         yield [ '/** This is docblock @deprecated Foo */'];
+
+        yield [
+            '/** `@deprecated` mentioned in prose is not a real tag */',
+            function (Docblock $block): void {
+                self::assertFalse($block->hasTag(DeprecatedTag::class));
+            }
+        ];
         yield [ '@mixin Foo\Bar'];
         yield [ '@param string $foo This is a parameter'];
         yield ['@param Baz\Bar $foobar This is a parameter'];

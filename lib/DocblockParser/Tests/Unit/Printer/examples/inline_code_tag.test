@@ -1,0 +1,8 @@
+/**
+ * A producer annotated `@template-covariant T` may accept a child value.
+ */
+---
+Docblock: = 
+ ElementList: = /**
+ * A producer annotated `@template-covariant T` may accept a child value.
+ */

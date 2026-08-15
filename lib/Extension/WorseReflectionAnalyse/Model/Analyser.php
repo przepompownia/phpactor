@@ -3,9 +3,11 @@
 namespace Phpactor\Extension\WorseReflectionAnalyse\Model;
 
 use Generator;
+use Phpactor\Extension\WorseReflectionAnalyse\SourceLocator\AnalysedFilesIndex;
 use Phpactor\Filesystem\Domain\FileList;
 use Phpactor\Filesystem\Domain\FilePath;
 use Phpactor\Filesystem\Domain\FilesystemRegistry;
+use Phpactor\TextDocument\TextDocument;
 use Phpactor\TextDocument\TextDocumentBuilder;
 use Phpactor\WorseReflection\Core\Diagnostic;
 use Phpactor\WorseReflection\Core\Diagnostics;
@@ -19,7 +21,8 @@ class Analyser
 {
     public function __construct(
         private FilesystemRegistry $filesystem,
-        private SourceCodeReflector $reflector
+        private SourceCodeReflector $reflector,
+        private AnalysedFilesIndex $index,
     ) {
     }
 
@@ -35,16 +38,24 @@ class Analyser
             return;
         }
 
+        /** @var array<string,TextDocument> $documents */
+        $documents = [];
         foreach ($this->fileList($absPath) as $file) {
+            $document = TextDocumentBuilder::fromUri($file->path())->build();
+            $documents[$file->path()] = $document;
+            $this->index->index($document);
+        }
+
+        foreach ($documents as $filePath => $document) {
             try {
                 yield Path::makeRelative(
-                    $file->path(),
+                    $filePath,
                     $cwd
-                ) => wait($this->reflector->diagnostics(TextDocumentBuilder::fromUri($file->path())->build()));
+                ) => wait($this->reflector->diagnostics($document));
             } catch (Throwable $error) {
                 throw new RuntimeException(sprintf(
                     'Error while analysing file "%s": %s',
-                    $file,
+                    $filePath,
                     $error->getMessage()
                 ), 0, $error);
             }

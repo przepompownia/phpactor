@@ -17,6 +17,7 @@ final class Lexer
         '/\*+', // start tag
         '\*/', // close tag
         ' {1}\* {1}',
+        '`[^`\r\n]*`', // inline code span - never a real tag, whatever it contains
         '\[\]', // list
         '\?', //tag
         '@[\w-]+', //tag
@@ -78,7 +79,9 @@ final class Lexer
             $this->pattern,
             $docblock,
             -1,
-            PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE
+            PREG_SPLIT_NO_EMPTY
+                | PREG_SPLIT_DELIM_CAPTURE
+                | PREG_SPLIT_OFFSET_CAPTURE
         );
 
         if (false === $chunks) {
@@ -103,6 +106,10 @@ final class Lexer
 
     private function resolveType(string $value): string
     {
+        if ($value[0] === '`') {
+            return Token::T_INLINE_CODE;
+        }
+
         if (str_contains($value, '/*')) {
             return Token::T_PHPDOC_OPEN;
         }

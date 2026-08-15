@@ -138,5 +138,25 @@ class LexerTest extends TestCase
                 [Token::T_ASTERISK, '*'],
             ]
         ];
+
+        yield 'inline code span is a single token, not a tag' => [
+            '`@deprecated`',
+            [
+                [Token::T_INLINE_CODE, '`@deprecated`'],
+            ]
+        ];
+
+        yield 'inline code span with prose does not leak a tag' => [
+            'See `@template-covariant T` for details',
+            [
+                [Token::T_LABEL, 'See'],
+                [Token::T_WHITESPACE, ' '],
+                [Token::T_INLINE_CODE, '`@template-covariant T`'],
+                [Token::T_WHITESPACE, ' '],
+                [Token::T_LABEL, 'for'],
+                [Token::T_WHITESPACE, ' '],
+                [Token::T_LABEL, 'details'],
+            ]
+        ];
     }
 }
