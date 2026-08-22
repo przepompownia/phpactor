@@ -1,0 +1,1 @@
+#[{{ prototype.name }}{% if prototype.arguments|length > 0 %}({% for argument in prototype.arguments %}{{ argument.export()|raw }}{% if not loop.last %}, {% endif %}{% endfor %}){% endif %}]

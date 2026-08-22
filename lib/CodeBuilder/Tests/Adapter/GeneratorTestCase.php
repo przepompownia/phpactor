@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use Generator;
 use PHPUnit\Framework\TestCase;
 use Phpactor\CodeBuilder\Domain\Builder\SourceCodeBuilder;
+use Phpactor\CodeBuilder\Domain\Prototype\Attribute;
 use Phpactor\CodeBuilder\Domain\Prototype\ClassPrototype;
 use Phpactor\CodeBuilder\Domain\Prototype\Classes;
 use Phpactor\CodeBuilder\Domain\Prototype\Constant;
@@ -224,7 +225,6 @@ abstract class GeneratorTestCase extends TestCase
                             ReturnType::none(),
                             Docblock::none(),
                             0,
-                            false,
                             MethodBody::fromLines([
                                 Line::fromString('$this->foobar = $barfoo;')
                             ])
@@ -237,6 +237,39 @@ abstract class GeneratorTestCase extends TestCase
                         public function hello()
                         {
                             $this->foobar = $barfoo;
+                        }
+                    }
+                    EOT
+            ];
+        yield 'Renders a class method with attributes' => [
+                new ClassPrototype(
+                    'Dog',
+                    Properties::empty(),
+                    Constants::empty(),
+                    Methods::fromMethods([
+                        new Method(
+                            'hello',
+                            null,
+                            Parameters::empty(),
+                            ReturnType::none(),
+                            Docblock::none(),
+                            0,
+                            MethodBody::fromLines([]),
+                            null,
+                            [
+                                new Attribute('Foobar', [Value::fromValue('bar'), Value::fromValue(123)]),
+                                new Attribute('\Barfoo\Bagg', []),
+                            ]
+                        ),
+                    ])
+                ),
+                <<<'EOT'
+                    class Dog
+                    {
+                        #[Foobar('bar', 123)]
+                        #[\Barfoo\Bagg]
+                        public function hello()
+                        {
                         }
                     }
                     EOT
@@ -481,7 +514,6 @@ abstract class GeneratorTestCase extends TestCase
                         ReturnType::none(),
                         Docblock::none(),
                         0,
-                        false,
                         MethodBody::fromLines([
                             Line::fromString('$this->foobar = $barfoo;'),
                         ])

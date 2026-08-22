@@ -2,8 +2,6 @@
 
 namespace Phpactor\CodeBuilder\Domain\Prototype;
 
-use Attribute;
-
 final class Method extends Prototype
 {
     const IS_STATIC = 1;
@@ -24,10 +22,11 @@ final class Method extends Prototype
 
     private bool $isAbstract;
 
-    private bool $override;
-
     private MethodBody $methodBody;
 
+    /**
+     * @param Attribute[] $attributes
+     */
     public function __construct(
         private string $name,
         ?Visibility $visibility = null,
@@ -35,7 +34,6 @@ final class Method extends Prototype
         ?ReturnType $returnType = null,
         ?Docblock $docblock = null,
         int $modifierFlags = 0,
-        bool $override = false,
         ?MethodBody $methodBody = null,
         ?UpdatePolicy $updatePolicy = null,
         private array $attributes = [],
@@ -47,7 +45,6 @@ final class Method extends Prototype
         $this->docblock = $docblock ?? Docblock::none();
         $this->isStatic = (bool)($modifierFlags & self::IS_STATIC);
         $this->isAbstract = (bool)($modifierFlags & self::IS_ABSTRACT);
-        $this->override = $override;
         $this->methodBody = $methodBody ?? MethodBody::empty();
     }
 
@@ -92,11 +89,6 @@ final class Method extends Prototype
     public function isAbstract(): bool
     {
         return $this->isAbstract;
-    }
-
-    public function isOverride(): bool
-    {
-        return $this->override;
     }
 
     public function body(): MethodBody

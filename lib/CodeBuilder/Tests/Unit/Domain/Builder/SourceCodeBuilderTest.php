@@ -290,7 +290,7 @@ class SourceCodeBuilderTest extends TestCase
         ];
         yield 'Attributes' => [
             $this->builder()->class('Dog')->method('one')->attribute('Foobar', ['foo', 'bar']),
-            function ($method): void {
+            function (Method $method): void {
                 $this->assertCount(1, $method->attributes());
             }
         ];

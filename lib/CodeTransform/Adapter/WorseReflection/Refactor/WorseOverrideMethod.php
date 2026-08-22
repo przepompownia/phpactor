@@ -60,7 +60,7 @@ class WorseOverrideMethod implements OverrideMethod
 
         $methodBuilder = $builder->class($method->declaringClass()->name()->short())->method($method->name());
         if (version_compare($this->phpVersion, '8.3', '>=')) {
-            $methodBuilder->override();
+            $methodBuilder->attribute('\Override', []);
         }
 
         return $methodBuilder;
