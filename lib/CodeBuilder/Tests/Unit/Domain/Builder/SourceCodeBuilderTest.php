@@ -288,6 +288,12 @@ class SourceCodeBuilderTest extends TestCase
                 $this->assertEquals('one', (string) $method->body()->lines()->first());
             }
         ];
+        yield 'Attributes' => [
+            $this->builder()->class('Dog')->method('one')->attribute('Foobar', ['foo', 'bar']),
+            function ($method): void {
+                $this->assertCount(1, $method->attributes());
+            }
+        ];
     }
 
     public function testParameterBuilder(): void

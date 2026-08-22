@@ -2,8 +2,10 @@
 
 namespace Phpactor\CodeBuilder\Domain\Builder;
 
+use Phpactor\CodeBuilder\Domain\Prototype\Attribute;
 use Phpactor\CodeBuilder\Domain\Prototype\Type;
 use Phpactor\CodeBuilder\Domain\Prototype\UpdatePolicy;
+use Phpactor\CodeBuilder\Domain\Prototype\Value;
 use Phpactor\CodeBuilder\Domain\Prototype\Visibility;
 use Phpactor\CodeBuilder\Domain\Prototype\Parameters;
 use Phpactor\CodeBuilder\Domain\Prototype\Method;
@@ -29,6 +31,11 @@ class MethodBuilder extends AbstractBuilder implements NamedBuilder
     protected bool $abstract = false;
 
     protected bool $override = false;
+
+    /**
+     * @var Attribute[]
+     */
+    protected array $attributes = [];
 
     protected MethodBodyBuilder $bodyBuilder;
 
@@ -59,6 +66,17 @@ class MethodBuilder extends AbstractBuilder implements NamedBuilder
     {
         $this->visibility = Visibility::fromString($visibility);
 
+        return $this;
+    }
+
+    /**
+     * @param list<mixed> $arguments
+     */
+    public function attribute(string $name, array $arguments): MethodBuilder
+    {
+        $this->attributes[] = new Attribute($name, array_map(function (mixed $argument) {
+            return Value::fromValue($argument);
+        }, $arguments));
         return $this;
     }
 
@@ -120,7 +138,8 @@ class MethodBuilder extends AbstractBuilder implements NamedBuilder
             $modifiers,
             $this->override,
             $methodBody,
-            UpdatePolicy::fromModifiedState($this->isModified())
+            UpdatePolicy::fromModifiedState($this->isModified()),
+            $this->attributes
         );
     }
 

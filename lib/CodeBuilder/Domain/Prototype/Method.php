@@ -2,6 +2,8 @@
 
 namespace Phpactor\CodeBuilder\Domain\Prototype;
 
+use Attribute;
+
 final class Method extends Prototype
 {
     const IS_STATIC = 1;
@@ -35,7 +37,8 @@ final class Method extends Prototype
         int $modifierFlags = 0,
         bool $override = false,
         ?MethodBody $methodBody = null,
-        ?UpdatePolicy $updatePolicy = null
+        ?UpdatePolicy $updatePolicy = null,
+        private array $attributes = [],
     ) {
         parent::__construct($updatePolicy);
         $this->visibility = $visibility ?? Visibility::public();
@@ -66,6 +69,14 @@ final class Method extends Prototype
     public function returnType(): ReturnType
     {
         return $this->returnType;
+    }
+
+    /**
+     * @return Attribute[]
+     */
+    public function attributes(): array
+    {
+        return $this->attributes;
     }
 
     public function docblock(): Docblock
